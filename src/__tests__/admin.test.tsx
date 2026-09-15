@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { AdminLogin } from '@/components/admin/AdminLogin';
 import { OverviewManager } from '@/components/admin/OverviewManager';
 import { TopListManager } from '@/components/admin/TopListManager';
 import { PostsManager } from '@/components/admin/PostsManager';
@@ -9,10 +10,40 @@ import { SubscribersManager } from '@/components/admin/SubscribersManager';
 import { defaultTopItems, defaultPosts, defaultQuotes } from '@/lib/defaultData';
 
 describe('Milestone 5: Admin CMS Dashboard Components', () => {
-  test('AdminLayout renders brand, tabs, and triggers onTabChange', () => {
+  test('AdminLogin renders authorization form and handles input', () => {
+    const onLoginSuccess = jest.fn();
+    render(<AdminLogin onLoginSuccess={onLoginSuccess} />);
+
+    expect(screen.getByTestId('admin-login-screen')).toBeInTheDocument();
+    expect(screen.getByText('Creanote CMS')).toBeInTheDocument();
+    expect(
+      screen.getByText('Authorization required to access the admin console')
+    ).toBeInTheDocument();
+
+    const usernameInput = screen.getByTestId('admin-username-input');
+    const passwordInput = screen.getByTestId('admin-password-input');
+    const submitBtn = screen.getByTestId('admin-login-btn');
+
+    expect(usernameInput).toBeInTheDocument();
+    expect(passwordInput).toBeInTheDocument();
+    expect(submitBtn).toBeInTheDocument();
+
+    fireEvent.change(usernameInput, { target: { value: 'abrahamisaiah129' } });
+    fireEvent.change(passwordInput, { target: { value: 'GB0cvCtov4jdESip' } });
+
+    expect(usernameInput).toHaveValue('abrahamisaiah129');
+    expect(passwordInput).toHaveValue('GB0cvCtov4jdESip');
+  });
+
+  test('AdminLayout renders brand, tabs, logout button, and triggers onTabChange and onLogout', () => {
     const onTabChange = jest.fn();
+    const onLogout = jest.fn();
     render(
-      <AdminLayout activeTab="overview" onTabChange={onTabChange}>
+      <AdminLayout
+        activeTab="overview"
+        onTabChange={onTabChange}
+        onLogout={onLogout}
+      >
         <div>Admin Content</div>
       </AdminLayout>
     );
@@ -24,6 +55,11 @@ describe('Milestone 5: Admin CMS Dashboard Components', () => {
     const topListTab = screen.getByTestId('admin-tab-top-list');
     fireEvent.click(topListTab);
     expect(onTabChange).toHaveBeenCalledWith('top-list');
+
+    const logoutBtn = screen.getByTestId('admin-logout-btn');
+    expect(logoutBtn).toBeInTheDocument();
+    fireEvent.click(logoutBtn);
+    expect(onLogout).toHaveBeenCalledTimes(1);
   });
 
   test('OverviewManager displays stats counters and seed button', () => {

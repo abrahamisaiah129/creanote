@@ -146,6 +146,10 @@ Create a `.env.local` file in the root directory (or copy from `.env.example`):
 ```env
 MONGODB_URI=mongodb+srv://abrahamisaiah129_db_user:GB0cvCtov4jdESip@cluster0.rmkk060.mongodb.net/creanote?retryWrites=true&w=majority&appName=Cluster0
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# Admin CMS Credentials
+ADMIN_USERNAME=abrahamisaiah129
+ADMIN_PASSWORD=GB0cvCtov4jdESip
 ```
 
 ### 4. Run Development Server
@@ -155,7 +159,10 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### 5. Access CMS Admin Dashboard
-Navigate to [http://localhost:3000/admin](http://localhost:3000/admin) to manage all site content.
+The Admin link is intentionally omitted from the public navbar for security and privacy. To access the Content Management System:
+- Navigate directly to **[http://localhost:3000/admin](http://localhost:3000/admin)**.
+- Authenticate using the configured admin credentials (`ADMIN_USERNAME` and `ADMIN_PASSWORD`).
+- Sessions are secured via HTTP-only authorization cookies with one-click logout capability.
 
 ---
 
@@ -199,6 +206,7 @@ npm run build
 | `/api/hero-slides/[id]` | `PUT` / `DELETE` | Update or delete a hero slide |
 | `/api/newsletter` | `GET` | Retrieve subscriber list (Admin) |
 | `/api/newsletter` | `POST` | Subscribe email to newsletter |
+| `/api/admin/auth` | `GET` / `POST` / `DELETE` | Admin session status, login verification, and logout |
 | `/api/seed` | `POST` | Initialize database with default data |
 
 ---

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { AdminLogin } from '@/components/admin/AdminLogin';
 import { OverviewManager } from '@/components/admin/OverviewManager';
 import { TopListManager } from '@/components/admin/TopListManager';
 import { PostsManager } from '@/components/admin/PostsManager';
@@ -20,6 +21,9 @@ import { QuoteData } from '@/components/QuoteBand';
 import { SlideItem } from '@/components/HeroSlider';
 
 export default function AdminPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
   const [activeTab, setActiveTab] = useState('overview');
   const [topItems, setTopItems] = useState<TopCardData[]>(defaultTopItems);
   const [posts, setPosts] = useState<PostData[]>(defaultPosts);
@@ -28,6 +32,30 @@ export default function AdminPage() {
   const [subscribers, setSubscribers] = useState<{ email: string; createdAt?: string }[]>([
     { email: 'officialcreanote@gmail.com', createdAt: new Date().toISOString() },
   ]);
+
+  const checkAuth = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/auth');
+      if (res.ok) {
+        const data = await res.json();
+        setIsAuthenticated(!!data.authenticated);
+      }
+    } catch (e) {
+      console.warn('Auth check error, defaulting to unauthenticated:', e);
+      setIsAuthenticated(false);
+    } finally {
+      setIsCheckingAuth(false);
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/auth', { method: 'DELETE' });
+    } catch (e) {
+      console.warn('Logout error:', e);
+    }
+    setIsAuthenticated(false);
+  };
 
   const fetchAllData = useCallback(async () => {
     try {
@@ -65,11 +93,40 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    fetchAllData();
-  }, [fetchAllData]);
+    checkAuth();
+  }, [checkAuth]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchAllData();
+    }
+  }, [isAuthenticated, fetchAllData]);
+
+  if (isCheckingAuth) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          background: 'var(--bg)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'var(--muted)',
+          fontSize: '14px',
+          fontFamily: 'Ubuntu',
+        }}
+      >
+        Checking authorization...
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />;
+  }
 
   return (
-    <AdminLayout activeTab={activeTab} onTabChange={setActiveTab}>
+    <AdminLayout activeTab={activeTab} onTabChange={setActiveTab} onLogout={handleLogout}>
       {activeTab === 'overview' && (
         <OverviewManager
           topCount={topItems.length}

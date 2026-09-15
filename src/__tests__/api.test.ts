@@ -6,6 +6,22 @@ import { GET as getPosts, POST as postPost } from '@/app/api/posts/route';
 import { GET as getQuotes, POST as postQuote } from '@/app/api/quotes/route';
 import { GET as getHeroSlides, POST as postHeroSlide } from '@/app/api/hero-slides/route';
 import { POST as postNewsletter, GET as getSubscribers } from '@/app/api/newsletter/route';
+import { POST as postAuth, GET as getAuth, DELETE as deleteAuth } from '@/app/api/admin/auth/route';
+
+// Mock next/headers cookies
+const cookieStore = new Map<string, { value: string }>();
+jest.mock('next/headers', () => ({
+  cookies: () => ({
+    get: (name: string) => cookieStore.get(name),
+    set: (name: string, value: string) => {
+      if (value === '') {
+        cookieStore.delete(name);
+      } else {
+        cookieStore.set(name, { value });
+      }
+    },
+  }),
+}));
 
 describe('Milestone 3: CRUD API Endpoints', () => {
   describe('Top Items API', () => {
@@ -156,6 +172,60 @@ describe('Milestone 3: CRUD API Endpoints', () => {
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(Array.isArray(data)).toBe(true);
+    });
+  });
+
+  describe('Admin Authorization API', () => {
+    beforeEach(() => {
+      cookieStore.clear();
+    });
+
+    test('GET /api/admin/auth returns unauthenticated initially', async () => {
+      const response = await getAuth();
+      expect(response.status).toBe(200);
+      const data = await response.json();
+      expect(data.authenticated).toBe(false);
+    });
+
+    test('POST /api/admin/auth rejects invalid credentials', async () => {
+      const req = new Request('http://localhost:3000/api/admin/auth', {
+        method: 'POST',
+        body: JSON.stringify({ username: 'wrong', password: 'bad' }),
+      });
+      const response = await postAuth(req);
+      expect(response.status).toBe(401);
+      const data = await response.json();
+      expect(data.error).toBeDefined();
+    });
+
+    test('POST /api/admin/auth authenticates valid credentials and sets session', async () => {
+      const req = new Request('http://localhost:3000/api/admin/auth', {
+        method: 'POST',
+        body: JSON.stringify({
+          username: 'abrahamisaiah129',
+          password: 'GB0cvCtov4jdESip',
+        }),
+      });
+      const response = await postAuth(req);
+      expect(response.status).toBe(200);
+      const data = await response.json();
+      expect(data.success).toBe(true);
+
+      // Now verify GET returns authenticated
+      const checkRes = await getAuth();
+      const checkData = await checkRes.json();
+      expect(checkData.authenticated).toBe(true);
+    });
+
+    test('DELETE /api/admin/auth clears session and logs out', async () => {
+      cookieStore.set('creanote_admin_session', { value: 'authenticated' });
+
+      const logoutRes = await deleteAuth();
+      expect(logoutRes.status).toBe(200);
+
+      const checkRes = await getAuth();
+      const checkData = await checkRes.json();
+      expect(checkData.authenticated).toBe(false);
     });
   });
 });

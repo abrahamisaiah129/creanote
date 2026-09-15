@@ -38,7 +38,7 @@ describe('Milestone 2: Reusable UI Components', () => {
     expect(screen.getByText('Stories')).toBeInTheDocument();
     expect(screen.getByText('Quotes')).toBeInTheDocument();
     expect(screen.getByText('About')).toBeInTheDocument();
-    expect(screen.getByText('Admin')).toBeInTheDocument();
+    expect(screen.queryByText('Admin')).not.toBeInTheDocument();
 
     const contributeBtn = screen.getByRole('button', { name: /contribute/i });
     fireEvent.click(contributeBtn);

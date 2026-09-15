@@ -6,12 +6,14 @@ import Link from 'next/link';
 interface AdminLayoutProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  onLogout?: () => void;
   children: React.ReactNode;
 }
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({
   activeTab,
   onTabChange,
+  onLogout,
   children,
 }) => {
   const tabs = [
@@ -62,6 +64,21 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           >
             &larr; View Live Site
           </Link>
+          {onLogout && (
+            <button
+              type="button"
+              className="admin-tab-btn"
+              onClick={onLogout}
+              style={{
+                background: 'rgba(239, 68, 68, 0.15)',
+                borderColor: 'rgba(239, 68, 68, 0.4)',
+                color: '#ef4444',
+              }}
+              data-testid="admin-logout-btn"
+            >
+              Log Out
+            </button>
+          )}
         </div>
       </header>
 

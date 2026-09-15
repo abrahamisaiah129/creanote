@@ -39,9 +39,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onSearchClick, onContributeClick
           <Link href="/about" className={pathname === '/about' ? 'active' : ''} id="nav-about">
             About
           </Link>
-          <Link href="/admin" className={pathname === '/admin' ? 'active' : ''} id="nav-admin" title="CMS Admin Dashboard">
-            Admin
-          </Link>
           <span className="nav-search" onClick={onSearchClick} role="button" aria-label="Search" tabIndex={0}>
             &#9906;
           </span>
