@@ -33,7 +33,7 @@ describe('Milestone 2: Reusable UI Components', () => {
 
     render(<Navbar onSearchClick={onSearch} onContributeClick={onContribute} />);
 
-    expect(screen.getByText('Creanote.')).toBeInTheDocument();
+    expect(screen.getByAltText('Creanote.')).toBeInTheDocument();
     expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Stories')).toBeInTheDocument();
     expect(screen.getByText('Quotes')).toBeInTheDocument();

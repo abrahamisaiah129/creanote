@@ -64,7 +64,7 @@ export const defaultQuotes = [
     id: 'quote-1',
     boldText: "Your current struggle isn't your permanent reality.",
     bodyText:
-      "Don't be afraid to pivot your ideas or start over; the skills you learn in the failed attempts are what make the successful ones possible.",
+      "Don't be afraid to pivot your ideas or start over; the skills you learn in the failed attempts are what make the successful ones work.",
     tagText: 'QUOTE',
     caption:
       "This is your reminder that struggle doesn't mean failing, it means you're learning.",
@@ -72,6 +72,7 @@ export const defaultQuotes = [
     name: 'Software Developer',
     role: '@creanote_hq',
     avatarUrl: '/images/quote-avatar.jpg',
+    bannerUrl: '/images/hero-1.jpg',
     isActive: true,
     order: 0,
   },

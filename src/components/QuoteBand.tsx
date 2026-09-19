@@ -12,6 +12,7 @@ export interface QuoteData {
   name: string;
   role: string;
   avatarUrl: string;
+  bannerUrl?: string;
 }
 
 interface QuoteBandProps {
@@ -27,30 +28,18 @@ export const QuoteBand: React.FC<QuoteBandProps> = ({ quotes }) => {
 
   return (
     <div className="quote-band" data-testid="quote-band">
-      <div className="quote-inner">
-        <div>
-          <div className="quote-mark">&quot;</div>
-          <div className="quote-bold">{currentQuote.boldText}</div>
-          <div className="quote-body">{currentQuote.bodyText}</div>
-          <div style={{ marginTop: '22px' }}>
-            <div className="quote-tag badge-orange">
-              {currentQuote.tagText || 'QUOTE'}
-            </div>
-            <div className="quote-caption">{currentQuote.caption}</div>
-            <div className="quote-credit">
-              {currentQuote.credit || 'CREANOTE QUOTE TIMELINE'}
-            </div>
-          </div>
-        </div>
-        <div className="qperson">
-          <div className="qavatar">
+      {currentQuote.bannerUrl ? (
+        <div className="quote-banner-wrapper">
+          <div className="quote-banner-container">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={currentQuote.avatarUrl} alt={currentQuote.name} />
+            <img
+              src={currentQuote.bannerUrl}
+              alt={currentQuote.boldText || 'Creanote Quote'}
+              className="quote-banner-img"
+            />
           </div>
-          <div className="qname">{currentQuote.name}</div>
-          <div className="qrole">{currentQuote.role}</div>
           {quotes.length > 1 && (
-            <div className="qdots">
+            <div className="qdots quote-banner-dots">
               {quotes.map((_, idx) => (
                 <button
                   key={idx}
@@ -64,7 +53,46 @@ export const QuoteBand: React.FC<QuoteBandProps> = ({ quotes }) => {
             </div>
           )}
         </div>
-      </div>
+      ) : (
+        <div className="quote-inner">
+          <div>
+            <div className="quote-mark">&quot;</div>
+            <div className="quote-bold">{currentQuote.boldText}</div>
+            <div className="quote-body">{currentQuote.bodyText}</div>
+            <div style={{ marginTop: '22px' }}>
+              <div className="quote-tag badge-orange">
+                {currentQuote.tagText || 'QUOTE'}
+              </div>
+              <div className="quote-caption">{currentQuote.caption}</div>
+              <div className="quote-credit">
+                {currentQuote.credit || 'CREANOTE QUOTE TIMELINE'}
+              </div>
+            </div>
+          </div>
+          <div className="qperson">
+            <div className="qavatar">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={currentQuote.avatarUrl} alt={currentQuote.name} />
+            </div>
+            <div className="qname">{currentQuote.name}</div>
+            <div className="qrole">{currentQuote.role}</div>
+            {quotes.length > 1 && (
+              <div className="qdots">
+                {quotes.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    className={`qdot ${idx === activeIndex ? 'active' : ''}`}
+                    onClick={() => setActiveIndex(idx)}
+                    aria-label={`Show quote ${idx + 1}`}
+                    data-testid={`quote-dot-${idx}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

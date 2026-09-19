@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
+import Image from 'next/image';
 interface NavbarProps {
   onSearchClick?: () => void;
   onContributeClick?: () => void;
@@ -11,20 +11,18 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onSearchClick, onContributeClick }) => {
   const pathname = usePathname();
-
   return (
     <nav>
       <div className="nav-inner">
-        <Link href="/" className="logo">
-          <div className="logo-box">
-            <svg viewBox="0 0 14 14">
-              <rect x="1" y="1" width="5" height="5" rx="1" />
-              <rect x="8" y="1" width="5" height="5" rx="1" />
-              <rect x="1" y="8" width="5" height="5" rx="1" />
-              <rect x="8" y="8" width="5" height="5" rx="1" />
-            </svg>
-          </div>
-          Creanote.
+        <Link href="/" className="logo" aria-label="Creanote Home">
+          <Image
+            src="/images/creanote_logo.png"
+            alt="Creanote."
+            width={185}
+            height={28}
+            priority
+            style={{ height: '28px', width: 'auto', display: 'block' }}
+          />
         </Link>
         <div className="nav-links">
           <Link href="/" className={pathname === '/' ? 'active' : ''} id="nav-home">
