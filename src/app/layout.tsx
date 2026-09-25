@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import './globals.css';
+import { BackToTop } from '@/components/BackToTop';
 
 export const metadata: Metadata = {
   title: 'Creanote - Notes from the Creative Journey',
@@ -26,7 +27,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>{children}<BackToTop /></body>
     </html>
   );
 }

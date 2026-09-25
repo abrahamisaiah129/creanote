@@ -2,7 +2,11 @@
 
 import React, { useState } from 'react';
 import { TopCardData } from '../TopCard';
+import { placeholderUrl } from '@/lib/defaultData';
 import { Badge } from '../Badge';
+import { ImageUploadField } from '../ImageUploadField';
+import { DotsLoader } from '../DotsLoader';
+import { useActivityLog } from '@/context/ActivityLogContext';
 
 interface TopListManagerProps {
   items: TopCardData[];
@@ -10,13 +14,16 @@ interface TopListManagerProps {
 }
 
 export const TopListManager: React.FC<TopListManagerProps> = ({ items, onRefresh }) => {
+  const { addLog } = useActivityLog();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [meta, setMeta] = useState('');
   const [badgeText, setBadgeText] = useState('');
   const [badgeColor, setBadgeColor] = useState<'orange' | 'green'>('orange');
-  const [imageUrl, setImageUrl] = useState('/images/top-card-1.jpg');
+  const [imageUrl, setImageUrl] = useState(placeholderUrl('Top card', 800, 500));
+  const [linkUrl, setLinkUrl] = useState('');
   const [status, setStatus] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   const resetForm = () => {
     setEditingId(null);
@@ -24,7 +31,8 @@ export const TopListManager: React.FC<TopListManagerProps> = ({ items, onRefresh
     setMeta('');
     setBadgeText('');
     setBadgeColor('orange');
-    setImageUrl('/images/top-card-1.jpg');
+    setImageUrl(placeholderUrl('Top card', 800, 500));
+    setLinkUrl('');
     setStatus('');
   };
 
@@ -35,6 +43,7 @@ export const TopListManager: React.FC<TopListManagerProps> = ({ items, onRefresh
     setBadgeText(item.badgeText || '');
     setBadgeColor(item.badgeColor || 'orange');
     setImageUrl(item.imageUrl);
+    setLinkUrl((item as any).linkUrl || '');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -46,6 +55,7 @@ export const TopListManager: React.FC<TopListManagerProps> = ({ items, onRefresh
       const res = await fetch(`/api/top-items/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setStatus('Item deleted successfully.');
+        addLog('Deleted a highlight card', 'delete');
         onRefresh();
       }
     } catch (e) {
@@ -56,7 +66,7 @@ export const TopListManager: React.FC<TopListManagerProps> = ({ items, onRefresh
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('Saving...');
+    setIsSaving(true);
 
     const payload = {
       title,
@@ -64,6 +74,7 @@ export const TopListManager: React.FC<TopListManagerProps> = ({ items, onRefresh
       badgeText: badgeText.trim() || undefined,
       badgeColor,
       imageUrl,
+      linkUrl,
     };
 
     try {
@@ -75,6 +86,7 @@ export const TopListManager: React.FC<TopListManagerProps> = ({ items, onRefresh
         });
         if (res.ok) {
           setStatus('Item updated successfully!');
+          addLog(`Updated highlight card: "${title}"`, 'update');
           resetForm();
           onRefresh();
         }
@@ -86,6 +98,7 @@ export const TopListManager: React.FC<TopListManagerProps> = ({ items, onRefresh
         });
         if (res.ok) {
           setStatus('Item created successfully!');
+          addLog(`Created highlight card: "${title}"`, 'create');
           resetForm();
           onRefresh();
         }
@@ -93,22 +106,51 @@ export const TopListManager: React.FC<TopListManagerProps> = ({ items, onRefresh
     } catch (e) {
       console.error(e);
       setStatus('Error saving item.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
+  const ITEMS_PER_PAGE = 5;
+  const [currentTablePage, setCurrentTablePage] = useState(1);
+  const totalTablePages = Math.ceil(items.length / ITEMS_PER_PAGE) || 1;
+  const startIdx = (currentTablePage - 1) * ITEMS_PER_PAGE;
+  const paginatedItems = items.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+
   return (
     <div>
-      <div className="section-label">Manage &ldquo;Top on the List&rdquo; Cards</div>
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+        <div className="section-label m-0">Manage &ldquo;Top on the List&rdquo; Cards</div>
+        <button
+          type="button"
+          onClick={() => {
+            resetForm();
+            const el = document.getElementById('top-card-form');
+            el?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="admin-btn-primary text-xs py-2 px-3.5"
+          data-testid="add-new-top-card-btn"
+        >
+          + Add Highlight Card
+        </button>
+      </div>
 
-      <div className="admin-card">
-        <h4 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '16px' }}>
-          {editingId ? 'Edit Highlight Card' : 'Add New Highlight Card'}
-        </h4>
+      <div className="admin-card" id="top-card-form">
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-base font-bold">
+            {editingId ? 'Edit Highlight Card' : 'Add New Highlight Card'}
+          </h4>
+          {editingId && (
+            <span className="text-xs bg-[var(--orange)]/20 text-[var(--orange)] px-2.5 py-1 rounded font-bold border border-[var(--orange)]/30">
+              Editing Existing Card
+            </span>
+          )}
+        </div>
 
         <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div>
-              <label style={{ fontSize: '12px', color: 'var(--muted)', textTransform: 'uppercase' }}>
+              <label className="text-xs text-[var(--muted)] uppercase">
                 Title
               </label>
               <input
@@ -121,7 +163,7 @@ export const TopListManager: React.FC<TopListManagerProps> = ({ items, onRefresh
               />
             </div>
             <div>
-              <label style={{ fontSize: '12px', color: 'var(--muted)', textTransform: 'uppercase' }}>
+              <label className="text-xs text-[var(--muted)] uppercase">
                 Metadata Subtitle
               </label>
               <input
@@ -133,11 +175,23 @@ export const TopListManager: React.FC<TopListManagerProps> = ({ items, onRefresh
                 data-testid="top-item-meta-input"
               />
             </div>
+            <div>
+              <label className="text-xs text-[var(--muted)] uppercase">
+                Target Link URL
+              </label>
+              <input
+                className="admin-input"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                placeholder="e.g. /stories/my-post or /quotes/123"
+                data-testid="top-item-link-input"
+              />
+            </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
             <div>
-              <label style={{ fontSize: '12px', color: 'var(--muted)', textTransform: 'uppercase' }}>
+              <label className="text-xs text-[var(--muted)] uppercase">
                 Badge Text (Optional)
               </label>
               <input
@@ -149,7 +203,7 @@ export const TopListManager: React.FC<TopListManagerProps> = ({ items, onRefresh
               />
             </div>
             <div>
-              <label style={{ fontSize: '12px', color: 'var(--muted)', textTransform: 'uppercase' }}>
+              <label className="text-xs text-[var(--muted)] uppercase">
                 Badge Color
               </label>
               <select
@@ -161,23 +215,22 @@ export const TopListManager: React.FC<TopListManagerProps> = ({ items, onRefresh
                 <option value="green">Green (var(--green))</option>
               </select>
             </div>
-            <div>
-              <label style={{ fontSize: '12px', color: 'var(--muted)', textTransform: 'uppercase' }}>
-                Image Path / URL
-              </label>
-              <input
-                className="admin-input"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="/images/top-card-1.jpg"
-                required
-              />
-            </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <button type="submit" className="admin-btn-primary" data-testid="top-item-submit-btn">
-              {editingId ? 'Save Changes' : 'Create Highlight Card'}
+          <div className="mb-5">
+            <ImageUploadField
+              label="Highlight Card Visual (800x500)"
+              value={imageUrl}
+              onChange={setImageUrl}
+              fallbackPlaceholder={placeholderUrl('Top card', 800, 500)}
+              testId="top-card-image-input"
+              aspectRatioHint="Recommended: 16:10 or 800x500 landscape visual"
+            />
+          </div>
+
+          <div className="flex gap-3 items-center">
+            <button type="submit" className="admin-btn-primary" disabled={isSaving} data-testid="top-item-submit-btn">
+              {isSaving ? <DotsLoader /> : (editingId ? 'Save Changes' : 'Create Highlight Card')}
             </button>
             {editingId && (
               <button type="button" className="admin-tab-btn" onClick={resetForm}>
@@ -185,7 +238,7 @@ export const TopListManager: React.FC<TopListManagerProps> = ({ items, onRefresh
               </button>
             )}
             {status && (
-              <span style={{ fontSize: '13px', color: 'var(--green)' }}>
+              <span className="text-[13px] text-[var(--green)]">
                 {status}
               </span>
             )}
@@ -194,62 +247,101 @@ export const TopListManager: React.FC<TopListManagerProps> = ({ items, onRefresh
       </div>
 
       <div className="admin-card">
-        <h4 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '16px' }}>
-          Current Highlights ({items.length})
-        </h4>
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+          <h4 className="text-base font-bold flex items-center gap-3">
+            Current Highlights ({items.length})
+          </h4>
+          
+          <div className="flex items-center gap-3">
+            {items.length > 0 && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCurrentTablePage(p => Math.max(1, p - 1))}
+                  disabled={currentTablePage === 1}
+                  className="p-1 rounded-md bg-white/5 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10"
+                >
+                  &larr;
+                </button>
+                <span className="text-xs text-[var(--muted)] font-bold">
+                  Page {currentTablePage} of {totalTablePages}
+                </span>
+                <button
+                  onClick={() => setCurrentTablePage(p => Math.min(totalTablePages, p + 1))}
+                  disabled={currentTablePage === totalTablePages}
+                  className="p-1 rounded-md bg-white/5 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10"
+                >
+                  &rarr;
+                </button>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                resetForm();
+                const el = document.getElementById('top-card-form');
+                el?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="admin-btn-primary text-xs py-1.5 px-3"
+            >
+              + Add Highlight Card
+            </button>
+          </div>
+        </div>
 
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Preview</th>
-              <th>Title</th>
-              <th>Meta</th>
-              <th>Badge</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item, idx) => (
-              <tr key={item.id || idx}>
-                <td style={{ width: '80px' }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={item.imageUrl}
-                    alt={item.title}
-                    style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}
-                  />
-                </td>
-                <td style={{ fontWeight: 600, maxWidth: '300px' }}>{item.title}</td>
-                <td style={{ color: 'var(--muted)' }}>{item.meta || '—'}</td>
-                <td>
-                  {item.badgeText ? (
-                    <Badge text={item.badgeText} color={item.badgeColor || 'orange'} />
-                  ) : (
-                    '—'
-                  )}
-                </td>
-                <td>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <button
-                      className="admin-btn-edit"
-                      onClick={() => handleEdit(item)}
-                      data-testid={`edit-top-btn-${idx}`}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="admin-btn-danger"
-                      onClick={() => handleDelete(item.id)}
-                      data-testid={`delete-top-btn-${idx}`}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
+        <div className="overflow-x-auto w-full">
+          <table className="admin-table min-w-[550px]">
+            <thead>
+              <tr>
+                <th>Preview</th>
+                <th>Title</th>
+                <th>Meta</th>
+                <th>Badge</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {paginatedItems.map((item, idx) => (
+                <tr key={item.id || idx}>
+                  <td className="w-20">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={item.imageUrl}
+                      alt={item.title}
+                      className="w-[60px] h-10 object-cover rounded"
+                    />
+                  </td>
+                  <td className="font-semibold max-w-[300px]">{item.title}</td>
+                  <td className="text-[var(--muted)]">{item.meta || '—'}</td>
+                  <td>
+                    {item.badgeText ? (
+                      <Badge text={item.badgeText} color={item.badgeColor || 'orange'} />
+                    ) : (
+                      '—'
+                    )}
+                  </td>
+                  <td>
+                    <div className="flex gap-2">
+                      <button
+                        className="admin-btn-edit"
+                        onClick={() => handleEdit(item)}
+                        data-testid={`edit-top-btn-${idx}`}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="admin-btn-danger"
+                        onClick={() => handleDelete(item.id)}
+                        data-testid={`delete-top-btn-${idx}`}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

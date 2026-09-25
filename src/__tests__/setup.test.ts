@@ -3,25 +3,15 @@ import path from 'path';
 import { defaultHeroSlides, defaultTopItems, defaultQuotes, defaultPosts } from '@/lib/defaultData';
 
 describe('Milestone 1: Setup & Assets Verification', () => {
-  test('extracted images exist in public/images', () => {
-    const requiredImages = [
-      'hero-0.jpg',
-      'hero-1.jpg',
-      'hero-2.jpg',
-      'hero-3.jpg',
-      'top-card-1.jpg',
-      'top-card-2.jpg',
-      'top-card-3.jpg',
-      'quote-avatar.jpg',
-      'post-1.jpg',
-      'post-2.jpg',
-    ];
-
-    requiredImages.forEach((img) => {
-      const fullPath = path.join(process.cwd(), 'public/images', img);
-      expect(fs.existsSync(fullPath)).toBe(true);
-      const stat = fs.statSync(fullPath);
-      expect(stat.size).toBeGreaterThan(1000);
+  test('content images use title-based placeholders or local images', () => {
+    [...defaultHeroSlides, ...defaultTopItems].forEach((item) => {
+      expect(item.imageUrl).toMatch(/^(https:\/\/placehold\.co\/|\/images\/)/);
+    });
+    defaultQuotes.forEach((quote) => {
+      expect(quote.avatarUrl).toMatch(/^https:\/\/placehold\.co\//);
+    });
+    defaultPosts.filter((post) => post.thumbUrl).forEach((post) => {
+      expect(post.thumbUrl).toMatch(/^https:\/\/placehold\.co\//);
     });
   });
 

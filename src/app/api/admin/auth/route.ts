@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
+export const dynamic = 'force-dynamic';
+
 const VALID_USERNAMES = [
   (process.env.ADMIN_USERNAME || 'abrahamisaiah129').toLowerCase().trim(),
   'admin',

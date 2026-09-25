@@ -64,22 +64,35 @@ export async function POST() {
           name: q.name,
           role: q.role,
           avatarUrl: q.avatarUrl,
+          bannerUrl: q.bannerUrl,
           isActive: q.isActive,
           order: q.order,
         }))
       );
     }
 
-    // Seed Hero Slides if empty
+    // Seed Hero Slides if empty, otherwise update them
     const heroCount = await HeroSlide.countDocuments();
     if (heroCount === 0) {
-      await HeroSlide.insertMany(
-        defaultHeroSlides.map((h) => ({
-          imageUrl: h.imageUrl,
-          alt: h.alt,
-          order: h.order,
-          isActive: h.isActive,
-        }))
+      await HeroSlide.insertMany(defaultHeroSlides);
+    } else {
+      await Promise.all(
+        defaultHeroSlides.map((hero) =>
+          HeroSlide.updateOne(
+            { order: hero.order },
+            {
+              $set: {
+                imageUrl: hero.imageUrl,
+                mobileImageUrl: hero.mobileImageUrl,
+                title: hero.title,
+                meta: hero.meta,
+                badgeText: hero.badgeText,
+                headline: hero.headline,
+              },
+            },
+            { upsert: true }
+          )
+        )
       );
     }
 

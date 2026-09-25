@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { ActivityLogProvider } from '@/context/ActivityLogContext';
 import { AdminLogin } from '@/components/admin/AdminLogin';
 import { OverviewManager } from '@/components/admin/OverviewManager';
 import { TopListManager } from '@/components/admin/TopListManager';
@@ -9,29 +10,28 @@ import { PostsManager } from '@/components/admin/PostsManager';
 import { QuotesManager } from '@/components/admin/QuotesManager';
 import { HeroManager } from '@/components/admin/HeroManager';
 import { SubscribersManager } from '@/components/admin/SubscribersManager';
-import {
-  defaultTopItems,
-  defaultPosts,
-  defaultQuotes,
-  defaultHeroSlides,
-} from '@/lib/defaultData';
+
 import { TopCardData } from '@/components/TopCard';
 import { PostData } from '@/components/PostRow';
 import { QuoteData } from '@/components/QuoteBand';
 import { SlideItem } from '@/components/HeroSlider';
+
+import { motion } from 'framer-motion';
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   const [activeTab, setActiveTab] = useState('overview');
-  const [topItems, setTopItems] = useState<TopCardData[]>(defaultTopItems);
-  const [posts, setPosts] = useState<PostData[]>(defaultPosts);
-  const [quotes, setQuotes] = useState<QuoteData[]>(defaultQuotes);
-  const [heroSlides, setHeroSlides] = useState<SlideItem[]>(defaultHeroSlides);
+  const [topItems, setTopItems] = useState<TopCardData[]>([]);
+  const [posts, setPosts] = useState<PostData[]>([]);
+  const [quotes, setQuotes] = useState<QuoteData[]>([]);
+  const [heroSlides, setHeroSlides] = useState<SlideItem[]>([]);
   const [subscribers, setSubscribers] = useState<{ email: string; createdAt?: string }[]>([
     { email: 'officialcreanote@gmail.com', createdAt: new Date().toISOString() },
   ]);
+
+  const [isLoading, setIsLoading] = useState(true);
 
   const checkAuth = useCallback(async () => {
     try {
@@ -58,6 +58,7 @@ export default function AdminPage() {
   };
 
   const fetchAllData = useCallback(async () => {
+    setIsLoading(true);
     try {
       const [topRes, postsRes, quotesRes, heroRes, subRes] = await Promise.all([
         fetch('/api/top-items'),
@@ -69,26 +70,28 @@ export default function AdminPage() {
 
       if (topRes.ok) {
         const data = await topRes.json();
-        if (Array.isArray(data) && data.length > 0) setTopItems(data);
+        if (Array.isArray(data)) setTopItems(data);
       }
       if (postsRes.ok) {
         const data = await postsRes.json();
-        if (Array.isArray(data) && data.length > 0) setPosts(data);
+        if (Array.isArray(data)) setPosts(data);
       }
       if (quotesRes.ok) {
         const data = await quotesRes.json();
-        if (Array.isArray(data) && data.length > 0) setQuotes(data);
+        if (Array.isArray(data)) setQuotes(data);
       }
       if (heroRes.ok) {
         const data = await heroRes.json();
-        if (Array.isArray(data) && data.length > 0) setHeroSlides(data);
+        if (Array.isArray(data)) setHeroSlides(data);
       }
       if (subRes.ok) {
         const data = await subRes.json();
-        if (Array.isArray(data) && data.length > 0) setSubscribers(data);
+        if (Array.isArray(data)) setSubscribers(data);
       }
     } catch (e) {
       console.warn('Using local fallback state in admin:', e);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -104,19 +107,26 @@ export default function AdminPage() {
 
   if (isCheckingAuth) {
     return (
-      <div
-        style={{
-          minHeight: '100vh',
-          background: 'var(--bg)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'var(--muted)',
-          fontSize: '14px',
-          fontFamily: 'Ubuntu',
-        }}
-      >
-        Checking authorization...
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center flex-col gap-6">
+        <div className="relative flex items-center justify-center">
+          <motion.div
+            className="absolute h-16 w-16 rounded-full border-t-2 border-[var(--green)] border-r-2 border-r-transparent border-b-2 border-b-[var(--orange)] border-l-2 border-l-transparent"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1.5, ease: 'linear', repeat: Infinity }}
+          />
+          <motion.div
+            className="h-4 w-4 rounded-full bg-[var(--green)]"
+            animate={{ scale: [1, 1.5, 1], opacity: [0.7, 1, 0.7] }}
+            transition={{ duration: 2, ease: 'easeInOut', repeat: Infinity }}
+          />
+        </div>
+        <motion.div 
+          className="text-[var(--muted)] text-[10px] font-[Ubuntu] tracking-widest uppercase font-bold"
+          animate={{ opacity: [0.4, 1, 0.4] }}
+          transition={{ duration: 2, ease: 'easeInOut', repeat: Infinity }}
+        >
+          Authenticating
+        </motion.div>
       </div>
     );
   }
@@ -126,37 +136,41 @@ export default function AdminPage() {
   }
 
   return (
-    <AdminLayout activeTab={activeTab} onTabChange={setActiveTab} onLogout={handleLogout}>
-      {activeTab === 'overview' && (
-        <OverviewManager
-          topCount={topItems.length}
-          postCount={posts.length}
-          quoteCount={quotes.length}
-          heroCount={heroSlides.length}
-          subCount={subscribers.length}
-          onRefresh={fetchAllData}
-        />
-      )}
+    <ActivityLogProvider>
+      <AdminLayout activeTab={activeTab} onTabChange={setActiveTab} onLogout={handleLogout}>
+        {activeTab === 'overview' && (
+          <OverviewManager
+            isLoading={isLoading}
+            topCount={topItems.length}
+            postCount={posts.length}
+            quoteCount={quotes.length}
+            heroCount={heroSlides.length}
+            subCount={subscribers.length}
+            onRefresh={fetchAllData}
+            onNavigateTab={setActiveTab}
+          />
+        )}
 
-      {activeTab === 'top-list' && (
-        <TopListManager items={topItems} onRefresh={fetchAllData} />
-      )}
+        {activeTab === 'top-list' && (
+          <TopListManager items={topItems} onRefresh={fetchAllData} />
+        )}
 
-      {activeTab === 'posts' && (
-        <PostsManager posts={posts} onRefresh={fetchAllData} />
-      )}
+        {activeTab === 'posts' && (
+          <PostsManager posts={posts} onRefresh={fetchAllData} />
+        )}
 
-      {activeTab === 'quotes' && (
-        <QuotesManager quotes={quotes} onRefresh={fetchAllData} />
-      )}
+        {activeTab === 'quotes' && (
+          <QuotesManager quotes={quotes} onRefresh={fetchAllData} />
+        )}
 
-      {activeTab === 'hero' && (
-        <HeroManager slides={heroSlides} onRefresh={fetchAllData} />
-      )}
+        {activeTab === 'hero' && (
+          <HeroManager slides={heroSlides} onRefresh={fetchAllData} />
+        )}
 
-      {activeTab === 'subscribers' && (
-        <SubscribersManager subscribers={subscribers} />
-      )}
-    </AdminLayout>
+        {activeTab === 'subscribers' && (
+          <SubscribersManager subscribers={subscribers} />
+        )}
+      </AdminLayout>
+    </ActivityLogProvider>
   );
 }

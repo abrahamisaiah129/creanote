@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { AdminLogin } from '@/components/admin/AdminLogin';
 import { OverviewManager } from '@/components/admin/OverviewManager';
@@ -8,6 +8,14 @@ import { PostsManager } from '@/components/admin/PostsManager';
 import { QuotesManager } from '@/components/admin/QuotesManager';
 import { SubscribersManager } from '@/components/admin/SubscribersManager';
 import { defaultTopItems, defaultPosts, defaultQuotes } from '@/lib/defaultData';
+
+jest.mock('@/context/ActivityLogContext', () => ({
+  useActivityLog: () => ({
+    addLog: jest.fn(),
+    logs: [],
+    clearLogs: jest.fn(),
+  }),
+}));
 
 describe('Milestone 5: Admin CMS Dashboard Components', () => {
   test('AdminLogin renders authorization form and handles input', () => {
@@ -48,8 +56,7 @@ describe('Milestone 5: Admin CMS Dashboard Components', () => {
       </AdminLayout>
     );
 
-    expect(screen.getByText('Creanote CMS')).toBeInTheDocument();
-    expect(screen.getByText('ADMIN')).toBeInTheDocument();
+    expect(screen.getByText('Admin')).toBeInTheDocument();
     expect(screen.getByText('Admin Content')).toBeInTheDocument();
 
     const topListTab = screen.getByTestId('admin-tab-top-list');
@@ -62,7 +69,7 @@ describe('Milestone 5: Admin CMS Dashboard Components', () => {
     expect(onLogout).toHaveBeenCalledTimes(1);
   });
 
-  test('OverviewManager displays stats counters and seed button', () => {
+  test('OverviewManager displays stats counters', async () => {
     const onRefresh = jest.fn();
     render(
       <OverviewManager
@@ -75,16 +82,17 @@ describe('Milestone 5: Admin CMS Dashboard Components', () => {
       />
     );
 
-    expect(screen.getByText('Top Highlights')).toBeInTheDocument();
-    expect(screen.getByText('3')).toBeInTheDocument();
-    expect(screen.getByText('Posts & Stories')).toBeInTheDocument();
-    expect(screen.getByText('6')).toBeInTheDocument();
+    expect(screen.getByText('Highlights')).toBeInTheDocument();
+    expect(screen.getByText('Stories')).toBeInTheDocument();
     expect(screen.getByText('Quotes')).toBeInTheDocument();
-    expect(screen.getByText('8')).toBeInTheDocument();
     expect(screen.getByText('Subscribers')).toBeInTheDocument();
-    expect(screen.getByText('10')).toBeInTheDocument();
 
-    expect(screen.getByTestId('seed-database-btn')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('3')).toBeInTheDocument();
+      expect(screen.getByText('6')).toBeInTheDocument();
+      expect(screen.getByText('8')).toBeInTheDocument();
+      expect(screen.getByText('10')).toBeInTheDocument();
+    }, { timeout: 3000 });
   });
 
   test('TopListManager displays current items and handles edit click', () => {
@@ -126,6 +134,8 @@ describe('Milestone 5: Admin CMS Dashboard Components', () => {
 
     expect(screen.getByText('Manage Quotes Timeline')).toBeInTheDocument();
     const boldInput = screen.getByTestId('quote-bold-input');
+    const heroCheckbox = screen.getByTestId('quote-hero-checkbox');
+    expect(heroCheckbox).toBeInTheDocument();
 
     const editBtn = screen.getByTestId('edit-quote-btn-0');
     fireEvent.click(editBtn);

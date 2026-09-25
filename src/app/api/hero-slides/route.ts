@@ -3,26 +3,24 @@ import { connectToDatabase } from '@/lib/mongodb';
 import { HeroSlide } from '@/models/HeroSlide';
 import { defaultHeroSlides } from '@/lib/defaultData';
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const conn = await connectToDatabase();
     if (conn) {
       const slides = await HeroSlide.find({}).sort({ order: 1, createdAt: 1 });
-      if (slides && slides.length > 0) {
-        return NextResponse.json(slides);
-      }
+      return NextResponse.json(slides);
     }
     return NextResponse.json(defaultHeroSlides);
   } catch (error) {
     console.error('Error fetching hero slides:', error);
-    return NextResponse.json(defaultHeroSlides);
+    return NextResponse.json({ error: 'Failed to fetch hero slides' }, { status: 500 });
   }
 }
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { imageUrl, alt, order, isActive } = body;
+    const { imageUrl, mobileImageUrl, alt, title, meta, badgeText, headline, linkUrl, order, isActive } = body;
 
     if (!imageUrl) {
       return NextResponse.json({ error: 'Image URL is required' }, { status: 400 });
@@ -38,7 +36,13 @@ export async function POST(req: Request) {
 
     const newSlide = await HeroSlide.create({
       imageUrl,
+      mobileImageUrl: mobileImageUrl || '',
       alt: alt || 'Creanote Hero Slide',
+      title: title || '',
+      meta: meta || '',
+      badgeText: badgeText || '',
+      headline: headline || '',
+      linkUrl: linkUrl || '',
       order: order || 0,
       isActive: isActive !== undefined ? !!isActive : true,
     });

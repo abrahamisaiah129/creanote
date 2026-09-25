@@ -6,6 +6,7 @@ export interface ITopItem extends Document {
   badgeText?: string;
   badgeColor?: 'orange' | 'green';
   imageUrl: string;
+  linkUrl?: string;
   order: number;
   createdAt: Date;
 }
@@ -16,6 +17,7 @@ const TopItemSchema: Schema = new Schema({
   badgeText: { type: String },
   badgeColor: { type: String, enum: ['orange', 'green'], default: 'orange' },
   imageUrl: { type: String, required: true },
+  linkUrl: { type: String, default: '' },
   order: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
 });

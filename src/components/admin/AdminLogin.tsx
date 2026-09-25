@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { DotsLoader } from '@/components/DotsLoader';
 
 interface AdminLoginProps {
   onLoginSuccess: () => void;
@@ -41,81 +42,43 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
 
   return (
     <div
-      style={{
-        minHeight: '100vh',
-        background: 'var(--bg)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '20px',
-      }}
+      className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-5"
       data-testid="admin-login-screen"
     >
       <div
-        className="admin-card"
-        style={{
-          maxWidth: '420px',
-          width: '100%',
-          padding: '40px',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.8)',
-          border: '1px solid var(--border)',
-        }}
+        className="admin-card max-w-[420px] w-full p-10 shadow-[0_20px_40px_rgba(0,0,0,0.8)] border border-[var(--border)]"
       >
-        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <div
-            className="logo-box"
-            style={{ margin: '0 auto 14px auto', width: '32px', height: '32px' }}
-          >
-            <svg viewBox="0 0 14 14" style={{ width: '20px', height: '20px' }}>
-              <rect x="1" y="1" width="5" height="5" rx="1" />
-              <rect x="8" y="1" width="5" height="5" rx="1" />
-              <rect x="1" y="8" width="5" height="5" rx="1" />
-              <rect x="8" y="8" width="5" height="5" rx="1" />
-            </svg>
+        <div className="text-center mb-7">
+          <div className="logo-box mx-auto mb-[14px] flex justify-center">
+            <img
+              src="/images/creanote-logo-white.png"
+              alt="Creanote CMS"
+              className="h-20 w-auto"
+            />
           </div>
           <h2
-            style={{
-              fontFamily: 'Ubuntu',
-              fontWeight: 800,
-              fontSize: '22px',
-              color: 'var(--text)',
-              marginBottom: '6px',
-            }}
+            className="font-[Ubuntu] font-extrabold text-[22px] text-[var(--text)] mb-[6px]"
           >
             Creanote CMS
           </h2>
-          <p style={{ color: 'var(--muted)', fontSize: '13px' }}>
+          <p className="text-[var(--muted)] text-[13px]">
             Authorization required to access the admin console
           </p>
         </div>
 
         {error && (
           <div
-            style={{
-              background: 'rgba(239, 68, 68, 0.12)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              color: '#ef4444',
-              padding: '10px 14px',
-              borderRadius: '8px',
-              fontSize: '13px',
-              marginBottom: '20px',
-            }}
+            className="text-[#ef4444] bg-[rgba(239,68,68,0.12)] border border-[rgba(239,68,68,0.3)] py-[10px] px-[14px] rounded-lg text-[13px] mb-5"
             data-testid="admin-login-error"
           >
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label
-              style={{
-                fontSize: '11px',
-                color: 'var(--muted)',
-                letterSpacing: '1px',
-                textTransform: 'uppercase',
-                fontWeight: 600,
-              }}
+              className="text-[11px] text-[var(--muted)] tracking-[1px] uppercase font-semibold"
             >
               Username
             </label>
@@ -133,13 +96,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
 
           <div>
             <label
-              style={{
-                fontSize: '11px',
-                color: 'var(--muted)',
-                letterSpacing: '1px',
-                textTransform: 'uppercase',
-                fontWeight: 600,
-              }}
+              className="text-[11px] text-[var(--muted)] tracking-[1px] uppercase font-semibold"
             >
               Password
             </label>
@@ -156,24 +113,18 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
 
           <button
             type="submit"
-            className="admin-btn-primary"
-            style={{ width: '100%', marginTop: '8px', padding: '12px' }}
+            className="admin-btn-primary w-full mt-2 p-3"
             disabled={loading}
             data-testid="admin-login-btn"
           >
-            {loading ? 'Authenticating...' : 'Unlock Admin Dashboard'}
+            {loading ? <DotsLoader /> : 'Unlock Admin Dashboard'}
           </button>
         </form>
 
-        <div style={{ textAlign: 'center', marginTop: '24px' }}>
+        <div className="text-center mt-6">
           <Link
             href="/"
-            style={{
-              color: 'var(--muted)',
-              fontSize: '13px',
-              textDecoration: 'none',
-              transition: 'color .2s',
-            }}
+            className="text-[var(--muted)] text-[13px] no-underline transition-colors"
           >
             &larr; Return to Public Website
           </Link>

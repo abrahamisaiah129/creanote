@@ -105,12 +105,23 @@ describe('Milestone 3: CRUD API Endpoints', () => {
 
   describe('Quotes API', () => {
     test('GET /api/quotes returns quotes list', async () => {
-      const response = await getQuotes();
+      const req = new Request('http://localhost:3000/api/quotes');
+      const response = await getQuotes(req);
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(Array.isArray(data)).toBe(true);
       expect(data[0]).toHaveProperty('boldText');
       expect(data[0]).toHaveProperty('name');
+    });
+
+    test('GET /api/quotes?name=Oluwadara filters quotes by quoter name', async () => {
+      const req = new Request('http://localhost:3000/api/quotes?name=Oluwadara');
+      const response = await getQuotes(req);
+      expect(response.status).toBe(200);
+      const data = await response.json();
+      expect(Array.isArray(data)).toBe(true);
+      expect(data.length).toBeGreaterThan(0);
+      expect(data.every((q: any) => (q.name || q.author).toLowerCase().includes('oluwadara'))).toBe(true);
     });
 
     test('POST /api/quotes validates fields and creates quote', async () => {
