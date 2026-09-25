@@ -26,6 +26,11 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
   autoplayInterval = 5000,
 }) => {
   const [current, setCurrent] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Minimum swipe distance to trigger slide change
+  const minSwipeDistance = 50;
 
   useEffect(() => {
     if (slides.length <= 1) return;
@@ -40,16 +45,62 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
     setCurrent(index);
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.clientX);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (touchStart !== null) {
+      setTouchEnd(e.clientX);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe) {
+      // Swiped left, go to next slide
+      setCurrent((prev) => (prev + 1) % slides.length);
+    }
+    if (isRightSwipe) {
+      // Swiped right, go to previous slide
+      setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
+    }
+    
+    setTouchStart(null);
+    setTouchEnd(null);
+  };
+
   return (
     <div
-      className="relative block aspect-[4/5] w-full max-w-[100vw] overflow-hidden bg-black sm:aspect-[16/8] lg:aspect-[16/7]"
+      className="relative block aspect-[4/5] w-full max-w-[100vw] overflow-hidden bg-black sm:aspect-[16/8] lg:aspect-[16/7] select-none"
       id="heroWrapper"
       data-testid="hero-slider"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleTouchEnd}
+      onMouseLeave={handleTouchEnd}
     >
       {slides.map((slide, idx) => {
         const slideContent = (
           <>
-            <picture>
+            <picture draggable={false} onDragStart={(e) => e.preventDefault()}>
               <source
                 media="(max-width: 639px)"
                 srcSet={slide.mobileImageUrl || slide.imageUrl}
@@ -59,6 +110,8 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
                 className="absolute inset-0 block h-full w-full object-cover object-center"
                 src={slide.imageUrl}
                 alt={slide.alt || `Creanote Slide ${idx + 1}`}
+                draggable={false}
+                onDragStart={(e) => e.preventDefault()}
               />
             </picture>
 
