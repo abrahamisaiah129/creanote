@@ -86,13 +86,13 @@ export default function QuotesPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col bg-white" data-testid="quotes-page">
+    <main className="flex min-h-screen flex-col bg-[var(--green)]" data-testid="quotes-page">
       <Navbar onSearchClick={() => setIsSearchModalOpen(true)} />
 
       <div className="pt-16 sm:pt-20 lg:pt-24" />
 
       {/* Solid Green Text Banner Quote */}
-      <div className="w-full bg-[var(--green)] px-6 py-20 md:py-32 flex flex-col items-center justify-center text-center">
+      <div className="w-full px-6 py-20 md:py-32 flex flex-col items-center justify-center text-center">
         <h2 className="font-['Ubuntu'] text-3xl md:text-5xl lg:text-6xl font-extrabold text-[#050806] max-w-4xl leading-tight">
           "there is no true road to success, work harder than ever.
         </h2>
