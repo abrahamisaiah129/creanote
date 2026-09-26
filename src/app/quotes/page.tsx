@@ -7,7 +7,7 @@ import { SearchModal } from '@/components/SearchModal';
 import { ContributeModal } from '@/components/ContributeModal';
 import { QuoteCardVisual } from '@/components/QuoteCardVisual';
 import { QuoteLightbox } from '@/components/QuoteLightbox';
-import { QuoteData } from '@/components/QuoteBand';
+import { QuoteBand, QuoteData } from '@/components/QuoteBand';
 
 const PAGE_SIZE = 8; // Load 8 images at a time for infinite scroll
 
