@@ -64,16 +64,9 @@ export const QuoteSection: React.FC<QuoteSectionProps> = ({
                 className="flex flex-col"
                 data-testid={`quote-card-item-${idx}`}
               >
-                {/* Pure Quote Image Card (Text and artwork are baked into image per Figma) */}
+                {/* Pure Quote Image Card */}
                 <QuoteCardVisual
-                  boldText={q.boldText}
-                  bodyText={q.bodyText}
-                  author={author}
-                  name={q.name}
-                  role={q.role}
-                  tagText={q.tagText}
-                  avatarUrl={q.avatarUrl}
-                  imageUrl={q.imageUrl || q.bannerUrl}
+                  imageUrl={q.imageUrl}
                   onClick={() => handleOpenLightbox(idx)}
                 />
               </div>

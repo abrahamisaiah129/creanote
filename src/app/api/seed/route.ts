@@ -56,15 +56,7 @@ export async function POST() {
     if (quoteCount === 0) {
       await Quote.insertMany(
         defaultQuotes.map((q) => ({
-          boldText: q.boldText,
-          bodyText: q.bodyText,
-          tagText: q.tagText,
-          caption: q.caption,
-          credit: q.credit,
-          name: q.name,
-          role: q.role,
-          avatarUrl: q.avatarUrl,
-          bannerUrl: q.bannerUrl,
+          imageUrl: q.imageUrl,
           isActive: q.isActive,
           order: q.order,
         }))
