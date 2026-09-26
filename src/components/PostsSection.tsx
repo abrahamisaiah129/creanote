@@ -19,35 +19,7 @@ export const PostsSection: React.FC<PostsSectionProps> = ({
   itemsPerPage = 3,
   onPostClick,
 }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const totalPages = Math.ceil(posts.length / itemsPerPage) || 1;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentPosts = posts.slice(startIndex, startIndex + itemsPerPage);
-
-  const handlePillClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    if (rect.width > 0) {
-      const clickX = e.clientX - rect.left;
-      const clickRatio = Math.max(0, Math.min(1, clickX / rect.width));
-      const targetPage = Math.min(
-        totalPages,
-        Math.max(1, Math.ceil(clickRatio * totalPages))
-      );
-      if (targetPage === currentPage) {
-        setCurrentPage((p) => (p < totalPages ? p + 1 : 1));
-      } else {
-        setCurrentPage(targetPage);
-      }
-    } else {
-      setCurrentPage((p) => (p < totalPages ? p + 1 : 1));
-    }
-  };
-
-  const progressPercentage = Math.min(
-    100,
-    Math.max(0, (currentPage / totalPages) * 100)
-  );
+  const currentPosts = posts.slice(0, itemsPerPage);
 
   return (
     <section
@@ -76,34 +48,6 @@ export const PostsSection: React.FC<PostsSectionProps> = ({
               onClick={onPostClick ? () => onPostClick(post) : undefined}
             />
           ))}
-        </div>
-
-        {/* Pagination underneath (< 1 2 3 >) */}
-        <div className="mt-8 flex justify-center">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
-        </div>
-
-        {/* Progress Bar in Orange Below Component (Centered, 10% width, thick as before) */}
-        <div
-          role="progressbar"
-          aria-valuenow={currentPage}
-          aria-valuemin={1}
-          aria-valuemax={totalPages}
-          aria-label="Posts pagination progress - click for next set"
-          onClick={handlePillClick}
-          className="group mx-auto mt-8 flex h-1.5 w-[20%] min-w-[120px] max-w-[200px] md:w-[40%] md:max-w-[400px] cursor-pointer overflow-hidden rounded-full bg-white/20 transition-all hover:h-2"
-          title="Click to view next posts"
-          data-testid="posts-progress-bar"
-        >
-          <div
-            className="h-full rounded-full bg-[var(--orange)] transition-all duration-300 ease-out"
-            style={{ width: `${progressPercentage}%` }}
-            data-testid="posts-progress-fill"
-          />
         </div>
       </div>
     </section>

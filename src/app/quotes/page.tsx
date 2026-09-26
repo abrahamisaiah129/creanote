@@ -134,7 +134,15 @@ export default function QuotesPage() {
             ))}
             
             {/* Infinite Scroll Loaders & Trigger */}
-            {(isLoading || isFetchingMore) && (
+            {isLoading && quotes.length === 0 ? (
+              <>
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                  <div key={`skeleton-${i}`} className="flex flex-col overflow-hidden rounded-[20px] bg-[#0C100D] relative border border-white/5 animate-pulse min-h-[300px]">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
+                  </div>
+                ))}
+              </>
+            ) : isFetchingMore ? (
               <>
                 {[1, 2, 3, 4].map((i) => (
                   <div key={`skeleton-${i}`} className="flex flex-col overflow-hidden rounded-[20px] bg-[#0C100D] relative border border-white/5 animate-pulse min-h-[300px]">
@@ -142,9 +150,15 @@ export default function QuotesPage() {
                   </div>
                 ))}
               </>
-            )}
+            ) : null}
             
-            <div ref={loaderRef} className="col-span-full h-10 w-full" />
+            <div ref={loaderRef} className="col-span-full py-8 w-full flex items-center justify-center">
+              {!isLoading && quotes.length > 0 && currentPage >= totalPages && (
+                <span className="text-[var(--muted)] text-sm font-bold font-['Ubuntu']">
+                  No more quotes to load
+                </span>
+              )}
+            </div>
           </div>
 
         </div>
