@@ -92,7 +92,7 @@ export default function QuotesPage() {
       <div className="pt-16 sm:pt-20 lg:pt-24" />
 
       {/* Solid Green Text Banner Quote */}
-      <div className="w-full px-6 py-20 md:py-32 flex flex-col items-center justify-center text-center">
+      <div className="w-full px-6 pt-12 pb-8 md:pt-16 md:pb-8 lg:pt-20 flex flex-col items-center justify-center text-center">
         <h2 className="font-['Ubuntu'] text-3xl md:text-5xl lg:text-6xl font-extrabold text-[#050806] max-w-4xl leading-tight">
           "there is no true road to success, work harder than ever.
         </h2>
@@ -101,7 +101,7 @@ export default function QuotesPage() {
         </p>
       </div>
 
-      <section className="flex-1 px-6 py-12 md:py-20 lg:py-24">
+      <section className="flex-1 px-6 py-8 md:py-10">
         <div className="mx-auto w-full max-w-[1280px]">
           
           <div className="mb-16 flex flex-col sm:flex-row sm:items-center justify-between gap-6">

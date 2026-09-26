@@ -124,27 +124,11 @@ export const SearchModal: React.FC<SearchModalProps> = ({
     });
   }, [query, liveTopItems]);
 
-  // Universal Filter: Quotes (quoter name, author, bold text, body reflection, handle)
+  // Universal Filter: Quotes (removed per user request)
   const filteredQuotes = useMemo(() => {
-    if (!query.trim()) return [];
-    const lowerQuery = query.toLowerCase().trim();
-    return liveQuotes.filter((q) => {
-      const name = (q.name || "").toLowerCase();
-      const author = (q.author || "").toLowerCase();
-      const boldText = (q.boldText || "").toLowerCase();
-      const bodyText = (q.bodyText || "").toLowerCase();
-      const role = (q.role || "").toLowerCase();
-      const caption = (q.caption || "").toLowerCase();
-      return (
-        name.includes(lowerQuery) ||
-        author.includes(lowerQuery) ||
-        boldText.includes(lowerQuery) ||
-        bodyText.includes(lowerQuery) ||
-        role.includes(lowerQuery) ||
-        caption.includes(lowerQuery)
-      );
-    });
+    return [];
   }, [query, liveQuotes]);
+
 
   if (!isOpen) return null;
 
@@ -346,73 +330,6 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                 </div>
               )}
 
-              {/* QUOTES SECTION */}
-              {showQuotes && (
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#38bdf8]">
-                      Creator Quotes ({filteredQuotes.length})
-                    </span>
-                    <Link
-                      href="/quotes"
-                      onClick={onClose}
-                      className="text-xs font-bold text-[var(--green)] hover:underline inline-flex items-center gap-0.5"
-                    >
-                      View all in Quotes &rarr;
-                    </Link>
-                  </div>
-                  <div className="space-y-2">
-                    {filteredQuotes.map((q, idx) => {
-                      const quoter = q.author || q.name;
-                      const targetId = q.id || (q as any)._id;
-                      return (
-                        <Link
-                          key={targetId || q.boldText || idx}
-                          href={targetId ? `/quotes/${targetId}` : `/quotes?search=${encodeURIComponent(quoter)}`}
-                          onClick={onClose}
-                          className="group flex items-start gap-3 rounded-xl border border-white/5 bg-[#0f1712] p-3.5 transition hover:border-[var(--green)]/40 hover:bg-[#131f18] no-underline text-inherit"
-                        >
-                          {q.avatarUrl ? (
-                            /* eslint-disable-next-line @next/next/no-img-element */
-                            <img
-                              src={q.avatarUrl}
-                              alt={quoter}
-                              className="h-10 w-10 shrink-0 rounded-full object-cover border border-[var(--green)]"
-                            />
-                          ) : (
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-white font-bold text-xs">
-                              {quoter[0]}
-                            </div>
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs font-bold text-white group-hover:text-[var(--green)] transition">
-                                {quoter}
-                              </span>
-                              {q.role && (
-                                <span className="text-[11px] text-[var(--muted)]">
-                                  {q.role}
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-sm font-semibold italic text-neutral-200 line-clamp-2">
-                              &ldquo;{q.boldText}&rdquo;
-                            </div>
-                            {q.caption && (
-                              <div className="text-xs text-[var(--muted)] line-clamp-1 mt-1">
-                                {q.caption}
-                              </div>
-                            )}
-                          </div>
-                          <span className="text-neutral-500 group-hover:text-[var(--green)] transition shrink-0 pt-1">
-                            <ArrowUpRight size={15} />
-                          </span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
 
               {/* HIGHLIGHTS SECTION */}
               {showCards && (
