@@ -407,7 +407,7 @@ export const ContributeModal: React.FC<ContributeModalProps> = ({
                         setQuoteImageUrl(e.target.value);
                         setImageFileName(e.target.value ? 'External Image URL' : '');
                       }}
-                      placeholder="https://images.unsplash.com/..."
+                      placeholder="https://example.com/image.png"
                       className="flex-1 rounded-lg border border-white/10 bg-[#121c16] px-2.5 py-1 text-[11px] text-white placeholder:text-neutral-500 outline-none focus:border-[var(--green)]"
                       data-testid="quote-image-url-input"
                     />
