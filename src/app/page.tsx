@@ -32,7 +32,7 @@ export default function HomePage() {
         fetch("/api/hero-slides"),
         fetch("/api/posts?isTopOnTheList=true"),
         fetch("/api/quotes"),
-        fetch("/api/posts?isFeatured=true"),
+        fetch("/api/posts?limit=3"),
       ]);
 
       // Maximum limit for items to display on the homepage
