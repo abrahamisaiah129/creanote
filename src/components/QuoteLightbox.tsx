@@ -3,7 +3,6 @@
 import React, { useEffect, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
 import { QuoteData } from './QuoteBand';
-import { placeholderUrl } from '@/lib/defaultData';
 
 interface QuoteLightboxProps {
   isOpen: boolean;
@@ -54,16 +53,7 @@ export const QuoteLightbox: React.FC<QuoteLightboxProps> = ({
 
   if (!isOpen || !currentQuote) return null;
 
-  const displayTitle =
-    currentQuote.boldText.replace(/^["“”]|["“”]$/g, '') ||
-    currentQuote.author ||
-    currentQuote.name ||
-    'Creanote Quote';
-  const displayAuthor = currentQuote.author || currentQuote.name || 'Creanote Creator';
-  const imgSrc =
-    currentQuote.imageUrl ||
-    currentQuote.bannerUrl ||
-    placeholderUrl(displayTitle, 1000, 1000);
+  const imgSrc = currentQuote.imageUrl;
 
   return (
     <div
@@ -123,7 +113,7 @@ export const QuoteLightbox: React.FC<QuoteLightboxProps> = ({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imgSrc}
-            alt={displayAuthor ? `Quote by ${displayAuthor}` : displayTitle}
+            alt="Quote"
             className="max-h-[75vh] w-auto max-w-[88vw] object-contain sm:max-h-[82vh]"
             data-testid="lightbox-image"
           />
@@ -138,7 +128,7 @@ export const QuoteLightbox: React.FC<QuoteLightboxProps> = ({
             type="button"
             onClick={() => {
               if (typeof navigator !== 'undefined' && navigator.clipboard) {
-                navigator.clipboard.writeText(imgSrc);
+                navigator.clipboard.writeText(imgSrc || '');
                 alert('Quote image link copied to clipboard!');
               }
             }}

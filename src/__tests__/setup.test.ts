@@ -8,7 +8,7 @@ describe('Milestone 1: Setup & Assets Verification', () => {
       expect(item.imageUrl).toMatch(/^(https:\/\/placehold\.co\/|\/images\/)/);
     });
     defaultQuotes.forEach((quote) => {
-      expect(quote.avatarUrl).toMatch(/^https:\/\/placehold\.co\//);
+      expect(quote.imageUrl).toMatch(/^https:\/\/(images\.unsplash\.com|placehold\.co)\//);
     });
     defaultPosts.filter((post) => post.thumbUrl).forEach((post) => {
       expect(post.thumbUrl).toMatch(/^https:\/\/placehold\.co\//);

@@ -200,7 +200,7 @@ export const QuoteSection: React.FC<QuoteSectionProps> = ({
           aria-valuemax={totalPages}
           aria-label="Quote slides progress - click for next set"
           onClick={handlePillClick}
-          className="group mx-auto mt-8 flex h-1.5 w-[10%] min-w-[80px] max-w-[140px] cursor-pointer overflow-hidden rounded-full bg-white/20 transition-all hover:h-2"
+          className="group mx-auto mt-8 flex h-1.5 w-[20%] min-w-[120px] max-w-[200px] md:w-[40%] md:max-w-[400px] cursor-pointer overflow-hidden rounded-full bg-white/20 transition-all hover:h-2"
           title="Click to view next quotes"
           data-testid="quote-progress-bar"
         >

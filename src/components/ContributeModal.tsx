@@ -171,21 +171,18 @@ export const ContributeModal: React.FC<ContributeModalProps> = ({
     setErrorMessage('');
 
     try {
-      const finalImage =
-        quoteImageUrl.trim() ||
-        placeholderUrl(quoteText || quoteAuthor || 'Creanote quote', 800, 800);
+      const finalImage = quoteImageUrl.trim();
+      
+      if (!finalImage) {
+        throw new Error('Please upload an image for the quote.');
+      }
 
       const res = await fetch('/api/quotes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          boldText: quoteText,
-          bodyText: quoteText,
-          author: quoteAuthor,
-          name: quoteAuthor,
-          role: quoteRole.trim() || 'Creator',
           imageUrl: finalImage,
-          date: new Date().toISOString().split('T')[0],
+          isActive: false, // Default to inactive until approved by admin
         }),
       });
 
@@ -297,38 +294,6 @@ export const ContributeModal: React.FC<ContributeModalProps> = ({
             {/* QUOTE SUBMISSION FORM WITH DESIRED IMAGE UPLOAD */}
             {activeTab === 'quote' ? (
               <form onSubmit={handleSubmitQuote} className="flex flex-col gap-4">
-                {/* Quoter / Author Name */}
-                <div>
-                  <label className="font-['Ubuntu'] text-xs font-bold uppercase tracking-wider text-[var(--muted)]">
-                    Quoter Name (Author) *
-                  </label>
-                  <input
-                    type="text"
-                    className="mt-1.5 h-11 w-full rounded-xl border border-white/10 bg-[#121c16] px-3.5 font-['Ubuntu'] text-xs text-white placeholder:text-neutral-500 outline-none transition focus:border-[var(--green)]"
-                    placeholder="e.g. Oluwadara Afolabi"
-                    value={quoteAuthor || ''}
-                    onChange={(e) => setQuoteAuthor(e.target.value)}
-                    required
-                    data-testid="quote-submit-author"
-                  />
-                </div>
-
-                {/* Quote Words / Text */}
-                <div>
-                  <label className="font-['Ubuntu'] text-xs font-bold uppercase tracking-wider text-[var(--muted)]">
-                    Quote Words / Headline *
-                  </label>
-                  <textarea
-                    rows={3}
-                    className="mt-1.5 w-full resize-none rounded-xl border border-white/10 bg-[#121c16] p-3 font-['Ubuntu'] text-xs text-white placeholder:text-neutral-500 outline-none transition focus:border-[var(--green)] leading-relaxed"
-                    placeholder='e.g. "There is no true road to success, work harder than ever."'
-                    value={quoteText || ''}
-                    onChange={(e) => setQuoteText(e.target.value)}
-                    required
-                    data-testid="quote-submit-text"
-                  />
-                </div>
-
                 {/* DESIRED IMAGE UPLOAD AREA */}
                 <div>
                   <div className="flex items-center justify-between">
@@ -449,21 +414,6 @@ export const ContributeModal: React.FC<ContributeModalProps> = ({
                   </div>
                 </div>
 
-                {/* Quoter Role (Optional) */}
-                <div>
-                  <label className="font-['Ubuntu'] text-xs font-bold uppercase tracking-wider text-[var(--muted)]">
-                    Role / Discipline (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    className="mt-1.5 h-11 w-full rounded-xl border border-white/10 bg-[#121c16] px-3.5 font-['Ubuntu'] text-xs text-white placeholder:text-neutral-500 outline-none transition focus:border-[var(--green)]"
-                    placeholder="e.g. Product Designer, Developer, Founder"
-                    value={quoteRole || ''}
-                    onChange={(e) => setQuoteRole(e.target.value)}
-                  />
-                </div>
-
-                {/* Submit Quote Button */}
                 <button
                   type="submit"
                   className="mt-2 flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-[var(--green)] font-['Ubuntu'] text-xs font-bold text-black shadow-lg transition hover:bg-[var(--green-dark)] active:scale-98 disabled:opacity-50"
