@@ -154,9 +154,6 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
             label="Quote Image"
             value={imageUrl}
             onChange={setImageUrl}
-            placeholder="Image URL"
-            required
-            id="quote-image"
           />
 
           <div className="mb-6 flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-lg">
