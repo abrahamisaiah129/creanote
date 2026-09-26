@@ -132,6 +132,8 @@ export const defaultPosts = [
     featureText: '',
     page: 1,
     order: 0,
+    isFeatured: true,
+    isTopOnTheList: true,
   },
   {
     id: 'post-2',
@@ -151,6 +153,7 @@ export const defaultPosts = [
     featureText: '',
     page: 1,
     order: 1,
+    isTopOnTheList: true,
   },
   {
     id: 'post-3',
@@ -170,6 +173,7 @@ export const defaultPosts = [
     featureText: 'Creanote\nFeature',
     page: 1,
     order: 2,
+    isTopOnTheList: true,
   },
   {
     id: 'post-4',
@@ -189,6 +193,7 @@ export const defaultPosts = [
     featureText: '',
     page: 2,
     order: 3,
+    isTopOnTheList: true,
   },
   {
     id: 'post-5',

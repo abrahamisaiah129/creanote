@@ -47,8 +47,20 @@ export async function POST() {
           featureText: p.featureText,
           page: p.page,
           order: p.order,
+          isFeatured: p.isFeatured || false,
+          isTopOnTheList: p.isTopOnTheList || false,
         }))
       );
+    } else {
+      // Force update existing posts to have isFeatured and isTopOnTheList based on defaultPosts
+      for (const dp of defaultPosts) {
+        if (dp.isFeatured || dp.isTopOnTheList) {
+           await Post.findOneAndUpdate(
+             { headline: dp.headline },
+             { $set: { isFeatured: dp.isFeatured || false, isTopOnTheList: dp.isTopOnTheList || false } }
+           );
+        }
+      }
     }
 
     // Seed Quotes if empty
