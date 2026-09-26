@@ -85,22 +85,31 @@ export default function QuotesPage() {
     setCurrentPage(1);
   };
 
+  const heroQuote = quotes.find((q) => q.isActive) || quotes[0] || {
+    imageUrl: 'https://images.unsplash.com/photo-1550133730-695473e544be?q=80&w=800&auto=format&fit=crop',
+  };
+
   return (
-    <main className="flex min-h-screen flex-col bg-white" data-testid="quotes-page">
+    <main className="flex min-h-screen flex-col bg-[#050806]" data-testid="quotes-page">
       <Navbar onSearchClick={() => setIsSearchModalOpen(true)} />
 
-      <section className="flex-1 pt-32 pb-24 lg:pt-48 lg:pb-32 px-6">
+      <div className="pt-24 lg:pt-32" />
+
+      {/* Top Banner Quote */}
+      {quotes.length > 0 && <QuoteBand quotes={[heroQuote]} />}
+
+      <section className="flex-1 px-6 py-12 md:py-20 lg:py-24">
         <div className="mx-auto w-full max-w-[1280px]">
           
           <div className="mb-16 flex items-center justify-between">
-            <h1 className="font-['Ubuntu'] text-[clamp(40px,5vw,72px)] font-extrabold leading-[1.1] text-neutral-950">
+            <h1 className="font-['Ubuntu'] text-[clamp(40px,5vw,72px)] font-extrabold leading-[1.1] text-white">
               Quotes
             </h1>
             
             <button
               type="button"
               onClick={() => setIsContributeOpen(true)}
-              className="flex cursor-pointer items-center justify-center rounded-full border-2 border-neutral-950 bg-neutral-950 px-8 py-3 font-['Ubuntu'] text-sm font-bold text-white shadow-sm transition hover:bg-neutral-800 active:scale-95"
+              className="flex cursor-pointer items-center justify-center rounded-full border-2 border-[var(--green)] bg-[var(--green)] px-8 py-3 font-['Ubuntu'] text-sm font-bold text-black shadow-sm transition hover:bg-opacity-80 active:scale-95"
               data-testid="submit-quote-btn"
             >
               Submit a Quote
