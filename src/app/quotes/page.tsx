@@ -7,7 +7,7 @@ import { SearchModal } from '@/components/SearchModal';
 import { ContributeModal } from '@/components/ContributeModal';
 import { QuoteCardVisual } from '@/components/QuoteCardVisual';
 import { QuoteLightbox } from '@/components/QuoteLightbox';
-import { QuoteBand, QuoteData } from '@/components/QuoteBand';
+import { QuoteData } from '@/components/QuoteBand';
 
 const PAGE_SIZE = 8; // Load 8 images at a time for infinite scroll
 
@@ -85,31 +85,34 @@ export default function QuotesPage() {
     setCurrentPage(1);
   };
 
-  const heroQuote = quotes.find((q) => q.isActive) || quotes[0] || {
-    imageUrl: 'https://images.unsplash.com/photo-1550133730-695473e544be?q=80&w=800&auto=format&fit=crop',
-  };
-
   return (
-    <main className="flex min-h-screen flex-col bg-[#050806]" data-testid="quotes-page">
+    <main className="flex min-h-screen flex-col bg-white" data-testid="quotes-page">
       <Navbar onSearchClick={() => setIsSearchModalOpen(true)} />
 
-      <div className="pt-24 lg:pt-32" />
+      <div className="pt-16 sm:pt-20 lg:pt-24" />
 
-      {/* Top Banner Quote */}
-      {quotes.length > 0 && <QuoteBand quotes={[heroQuote]} />}
+      {/* Solid Green Text Banner Quote */}
+      <div className="w-full bg-[var(--green)] px-6 py-20 md:py-32 flex flex-col items-center justify-center text-center">
+        <h2 className="font-['Ubuntu'] text-3xl md:text-5xl lg:text-6xl font-extrabold text-[#050806] max-w-4xl leading-tight">
+          "there is no true road to success, work harder than ever.
+        </h2>
+        <p className="mt-6 md:mt-8 font-['Ubuntu'] text-lg md:text-2xl font-bold text-[#050806]/80 italic">
+          ~Anonymous
+        </p>
+      </div>
 
       <section className="flex-1 px-6 py-12 md:py-20 lg:py-24">
         <div className="mx-auto w-full max-w-[1280px]">
           
-          <div className="mb-16 flex items-center justify-between">
-            <h1 className="font-['Ubuntu'] text-[clamp(40px,5vw,72px)] font-extrabold leading-[1.1] text-white">
+          <div className="mb-16 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <h1 className="font-['Ubuntu'] text-[clamp(40px,5vw,72px)] font-extrabold leading-[1.1] text-[#050806]">
               Quotes
             </h1>
             
             <button
               type="button"
               onClick={() => setIsContributeOpen(true)}
-              className="flex cursor-pointer items-center justify-center rounded-full border-2 border-[var(--green)] bg-[var(--green)] px-8 py-3 font-['Ubuntu'] text-sm font-bold text-black shadow-sm transition hover:bg-opacity-80 active:scale-95"
+              className="flex cursor-pointer items-center justify-center rounded-full border-2 border-[#050806] bg-[#050806] px-8 py-3.5 font-['Ubuntu'] text-sm font-bold text-white shadow-sm transition hover:bg-[#0c120e] active:scale-95 whitespace-nowrap w-fit"
               data-testid="submit-quote-btn"
             >
               Submit a Quote
