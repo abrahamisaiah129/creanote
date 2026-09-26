@@ -15,6 +15,8 @@ export interface PostData {
   coverImage?: string;
   isFeatureBadge?: boolean;
   featureText?: string;
+  isFeatured?: boolean;
+  isTopOnTheList?: boolean;
   category?: string;
   author?: string;
   authorRole?: string;

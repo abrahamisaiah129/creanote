@@ -13,6 +13,7 @@ import { NewsletterBand } from "@/components/NewsletterBand";
 import { Footer } from "@/components/Footer";
 import { SearchModal } from "@/components/SearchModal";
 import { ContributeModal } from "@/components/ContributeModal";
+import { placeholderUrl } from "@/lib/defaultData";
 
 export default function HomePage() {
   const [heroSlides, setHeroSlides] = useState<SlideItem[]>([]);
@@ -29,7 +30,7 @@ export default function HomePage() {
     try {
       const [slidesRes, topRes, quotesRes, postsRes] = await Promise.all([
         fetch("/api/hero-slides"),
-        fetch("/api/top-items"),
+        fetch("/api/posts?isTopOnTheList=true"),
         fetch("/api/quotes"),
         fetch("/api/posts"),
       ]);
@@ -42,15 +43,26 @@ export default function HomePage() {
         if (Array.isArray(data)) setHeroSlides(data);
       }
       if (topRes.ok) {
-        const data = await topRes.json();
-        if (Array.isArray(data)) setTopItems(data);
+        const payload = await topRes.json();
+        const data = payload.data || payload;
+        if (Array.isArray(data)) {
+          setTopItems(data.slice(0, 4).map((p: any) => ({
+            id: p.id || p._id,
+            title: p.headline,
+            meta: p.sub,
+            imageUrl: p.thumbUrl || placeholderUrl(p.headline, 640, 360),
+            linkUrl: `/stories/${p.slug || p.id || p._id}`
+          })));
+        }
       }
       if (quotesRes.ok) {
-        const data = await quotesRes.json();
+        const payload = await quotesRes.json();
+        const data = payload.data || payload;
         if (Array.isArray(data)) setQuotes(data.slice(0, HOMEPAGE_LIMIT));
       }
       if (postsRes.ok) {
-        const data = await postsRes.json();
+        const payload = await postsRes.json();
+        const data = payload.data || payload;
         if (Array.isArray(data)) setPosts(data.slice(0, HOMEPAGE_LIMIT));
       }
     } catch (e) {

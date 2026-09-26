@@ -143,7 +143,7 @@ export const TopListSection: React.FC<TopListSectionProps> = ({
         aria-valuemax={100}
         aria-label="Top on the list scroll progress"
         onClick={handleProgressClick}
-        className="mx-auto mt-8 flex h-1.5 w-[10%] min-w-[80px] max-w-[140px] cursor-pointer overflow-hidden rounded-full bg-white/20 transition-all hover:h-2"
+        className="mx-auto mt-8 flex h-1.5 w-[20%] min-w-[120px] max-w-[200px] md:w-[40%] md:max-w-[400px] cursor-pointer overflow-hidden rounded-full bg-white/20 transition-all hover:h-2"
         title="Click to scroll through top list"
         data-testid="top-list-progress-bar"
       >

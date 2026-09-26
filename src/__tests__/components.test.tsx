@@ -314,20 +314,12 @@ describe('Milestone 2: Reusable UI Components', () => {
     expect(screen.getByTestId('contribute-modal')).toBeInTheDocument();
     expect(screen.getByText('Submit an Inspiring Quote')).toBeInTheDocument();
 
-    // Inputs for quote submission
-    const authorInput = screen.getByTestId('quote-submit-author');
-    const textInput = screen.getByTestId('quote-submit-text');
+    // Inputs for quote submission (image only)
     const uploadZone = screen.getByTestId('quote-image-upload-zone');
     const urlInput = screen.getByTestId('quote-image-url-input');
 
-    expect(authorInput).toBeInTheDocument();
-    expect(textInput).toBeInTheDocument();
     expect(uploadZone).toBeInTheDocument();
     expect(urlInput).toBeInTheDocument();
-
-    // Fill author and quote text
-    fireEvent.change(authorInput, { target: { value: 'OLUWADARA AFOLABI' } });
-    fireEvent.change(textInput, { target: { value: 'Work harder than ever.' } });
 
     // Provide desired image URL
     fireEvent.change(urlInput, { target: { value: 'https://images.unsplash.com/photo-1' } });

@@ -23,8 +23,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   // User friendly labels avoiding developer jargon
   const tabs = [
     { id: 'overview', label: 'Dashboard' },
-    { id: 'top-list', label: 'Featured Items' },
-    { id: 'posts', label: 'Articles & Stories' },
+    { id: 'posts', label: 'Posts' },
     { id: 'quotes', label: 'Quotes' },
     { id: 'hero', label: 'Homepage Banners' },
     { id: 'subscribers', label: 'Mailing List' },

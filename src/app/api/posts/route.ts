@@ -14,10 +14,14 @@ export async function GET(req: Request) {
     const sort = searchParams.get('sort')?.trim(); // 'OLDEST' or 'NEWEST'
     const readingTime = searchParams.get('readingTime')?.trim(); // 'SHORT' or 'LONG'
     const paginated = searchParams.get('paginated') === 'true';
+    const isFeatured = searchParams.get('isFeatured') === 'true';
+    const isTopOnTheList = searchParams.get('isTopOnTheList') === 'true';
 
     const conn = await connectToDatabase();
     if (conn) {
       const query: Record<string, any> = {};
+      if (isFeatured) query.isFeatured = true;
+      if (isTopOnTheList) query.isTopOnTheList = true;
       if (category && category.toUpperCase() !== 'ALL') {
         query.category = { $regex: new RegExp(`^${category}$`, 'i') };
       }

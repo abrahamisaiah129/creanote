@@ -18,6 +18,8 @@ export interface IPost extends Document {
   readTime?: string;
   isFeatureBadge?: boolean;
   featureText?: string;
+  isFeatured?: boolean;
+  isTopOnTheList?: boolean;
   createdAt: Date;
 }
 
@@ -39,6 +41,8 @@ const PostSchema: Schema = new Schema({
   readTime: { type: String, default: '4 min read' },
   isFeatureBadge: { type: Boolean, default: false },
   featureText: { type: String },
+  isFeatured: { type: Boolean, default: false },
+  isTopOnTheList: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
 

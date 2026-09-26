@@ -151,9 +151,7 @@ export default function AdminPage() {
           />
         )}
 
-        {activeTab === 'top-list' && (
-          <TopListManager items={topItems} onRefresh={fetchAllData} />
-        )}
+        {/* top-list removed */}
 
         {activeTab === 'posts' && (
           <PostsManager posts={posts} onRefresh={fetchAllData} />

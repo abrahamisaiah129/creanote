@@ -21,6 +21,9 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
   const [thumbUrl, setThumbUrl] = useState(placeholderUrl('Post thumbnail', 640, 360));
   const [isFeatureBadge, setIsFeatureBadge] = useState(false);
   const [featureText, setFeatureText] = useState('Creanote\nFeature');
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [isTopOnTheList, setIsTopOnTheList] = useState(false);
+  const [content, setContent] = useState('');
   const [authorAvatar, setAuthorAvatar] = useState('');
   const [status, setStatus] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -33,6 +36,9 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
     setThumbUrl(placeholderUrl('Post thumbnail', 640, 360));
     setIsFeatureBadge(false);
     setFeatureText('Creanote\nFeature');
+    setIsFeatured(false);
+    setIsTopOnTheList(false);
+    setContent('');
     setAuthorAvatar('');
     setStatus('');
   };
@@ -45,6 +51,9 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
     setThumbUrl(post.thumbUrl || '');
     setIsFeatureBadge(!!post.isFeatureBadge);
     setFeatureText(post.featureText || 'Creanote\nFeature');
+    setIsFeatured(!!post.isFeatured);
+    setIsTopOnTheList(!!post.isTopOnTheList);
+    setContent(post.content || '');
     setAuthorAvatar(post.authorAvatar || '');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -74,10 +83,13 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
       date,
       headline,
       sub,
+      content,
       thumbUrl: isFeatureBadge ? '' : thumbUrl,
       authorAvatar,
       isFeatureBadge,
       featureText: isFeatureBadge ? featureText : '',
+      isFeatured,
+      isTopOnTheList,
     };
 
     try {
@@ -180,6 +192,18 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
             </div>
           </div>
 
+          <div className="mb-4">
+            <label className="text-xs text-[var(--muted)] uppercase">
+              Story Content (Write up)
+            </label>
+            <textarea
+              className="admin-input h-32"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Full story content..."
+            />
+          </div>
+
           <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-xs text-[var(--muted)] uppercase">
@@ -201,6 +225,35 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
               testId="post-author-avatar-input"
               aspectRatioHint="Recommended: 1:1 circle/square avatar"
             />
+          </div>
+
+          <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4 border border-[var(--border)] p-4 rounded-lg bg-[var(--bg)]">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isFeatured}
+                onChange={(e) => setIsFeatured(e.target.checked)}
+                disabled={!isFeatured && posts.filter(p => p.isFeatured).length >= 1}
+                className="w-4 h-4 cursor-pointer accent-[var(--green)]"
+              />
+              <div className="flex flex-col">
+                <span className="text-[13px] font-bold">Featured Story</span>
+                <span className="text-[11px] text-[var(--muted)]">Shows on Homepage (Max 1)</span>
+              </div>
+            </label>
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isTopOnTheList}
+                onChange={(e) => setIsTopOnTheList(e.target.checked)}
+                disabled={!isTopOnTheList && posts.filter(p => p.isTopOnTheList).length >= 4}
+                className="w-4 h-4 cursor-pointer accent-[var(--green)]"
+              />
+              <div className="flex flex-col">
+                <span className="text-[13px] font-bold">Top on the List</span>
+                <span className="text-[11px] text-[var(--muted)]">Shows in Top Items section (Max 4)</span>
+              </div>
+            </label>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_120px] gap-4 mb-5">
