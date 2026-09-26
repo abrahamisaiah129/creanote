@@ -39,29 +39,13 @@ export default function QuoteDetailPage() {
             <DotsLoader />
           </div>
         ) : quote ? (
-          <article className="quote-detail-card">
-            {quote.bannerUrl && (
-              <div className="quote-detail-banner">
+          <article className="quote-detail-card bg-[#050806] rounded-2xl overflow-hidden border border-white/10 p-4 mt-8 flex flex-col items-center max-w-4xl mx-auto">
+            {quote.imageUrl && (
+              <div className="quote-detail-banner w-full">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={quote.bannerUrl} alt={quote.boldText} />
+                <img src={quote.imageUrl} alt="Quote" className="w-full h-auto rounded-xl object-contain" />
               </div>
             )}
-            <div className="quote-mark">&quot;</div>
-            <h1 className="quote-bold">{quote.boldText}</h1>
-            <p className="quote-body">{quote.bodyText}</p>
-            <div className="quote-detail-meta">
-              <span className="quote-tag badge-orange">{quote.tagText || 'QUOTE'}</span>
-              <p className="quote-caption">{quote.caption}</p>
-              <p className="quote-credit">{quote.credit || 'CREANOTE QUOTE TIMELINE'}</p>
-            </div>
-            <div className="quote-detail-person">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={quote.avatarUrl} alt={quote.name} />
-              <div>
-                <strong>{quote.name}</strong>
-                <span>{quote.role}</span>
-              </div>
-            </div>
           </article>
         ) : (
           <p className="quote-empty">This quote could not be found.</p>
