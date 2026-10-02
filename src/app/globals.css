@@ -46,6 +46,23 @@
   main, button, input, textarea, select {
     font-family: 'Ubuntu', sans-serif;
   }
+
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  input[type="month"] {
+    color-scheme: dark;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.6;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+  }
   
   /* 2. Hover Cursor (Links/Buttons): A minimalist target circle for clicking */
   a, button, .quote-card, input, select {

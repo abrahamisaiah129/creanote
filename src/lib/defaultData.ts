@@ -38,18 +38,7 @@ export const defaultHeroSlides = [
     order: 2,
     isActive: true,
   },
-  {
-    id: 'hero-3',
-    imageUrl: '/images/desktop-banner-final.jpg',
-    mobileImageUrl: '/images/mobile-banner-final.jpg',
-    alt: 'Creanote Hero 4',
-    title: "This is your reminder that struggle doesn't mean failing, it means you're learning.",
-    meta: 'CREANOTE QUOTE TIMELINE',
-    badgeText: 'QUOTE',
-    headline: "This is your reminder that struggle doesn't mean failing, it means you're learning.",
-    order: 3,
-    isActive: true,
-  },
+
 ];
 
 export const defaultTopItems = [

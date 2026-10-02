@@ -46,7 +46,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
   };
 
   const handleEdit = (post: PostData) => {
-    setEditingId(post.id || null);
+    setEditingId(post.id || (post as any)._id || null);
     setDate(post.date);
     setHeadline(post.headline);
     setSub(post.sub);
@@ -386,8 +386,10 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
               </tr>
             </thead>
             <tbody>
-              {paginatedPosts.map((post, idx) => (
-                <tr key={post.id || idx}>
+              {paginatedPosts.map((post, idx) => {
+                const postId = post.id || (post as any)._id;
+                return (
+                <tr key={postId || idx}>
                   <td className="text-[var(--orange)] font-bold">{formatDate(post.date)}</td>
                   <td className="font-semibold max-w-[300px]">{post.headline}</td>
                   <td className="text-[var(--muted)]">{post.sub}</td>
@@ -420,22 +422,23 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
                         className="admin-btn-edit"
                         onClick={() => handleEdit(post)}
                         data-testid={`edit-post-btn-${idx}`}
-                        disabled={deletingId === post.id}
+                        disabled={deletingId === postId}
                       >
                         Edit
                       </button>
                       <button
                         className="admin-btn-danger"
-                        onClick={() => handleDelete(post.id)}
+                        onClick={() => handleDelete(postId)}
                         data-testid={`delete-post-btn-${idx}`}
-                        disabled={deletingId === post.id}
+                        disabled={deletingId === postId}
                       >
-                        {deletingId === post.id ? 'Del...' : 'Delete'}
+                        {deletingId === postId ? 'Del...' : 'Delete'}
                       </button>
                     </div>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

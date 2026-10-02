@@ -41,7 +41,7 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
   };
 
   const handleEdit = (slide: SlideItem) => {
-    setEditingId(slide.id || null);
+    setEditingId(slide.id || (slide as any)._id || null);
     setImageUrl(slide.imageUrl);
     setMobileImageUrl(slide.mobileImageUrl || slide.imageUrl);
     setAlt(slide.alt || '');
@@ -121,6 +121,9 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
   const startIdx = (currentTablePage - 1) * ITEMS_PER_PAGE;
   const paginatedSlides = slides.slice(startIdx, startIdx + ITEMS_PER_PAGE);
 
+  const MAX_SLIDES = 3;
+  const canAddNew = slides.length < MAX_SLIDES;
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
@@ -128,17 +131,27 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
         <button
           type="button"
           onClick={() => {
+            if (!canAddNew) {
+              alert(`Maximum of ${MAX_SLIDES} hero slides allowed.`);
+              return;
+            }
             resetForm();
             const el = document.getElementById('hero-slide-form');
             el?.scrollIntoView({ behavior: 'smooth' });
           }}
-          className="admin-btn-primary text-xs py-2 px-3.5"
+          className={`text-xs py-2 px-3.5 ${canAddNew ? 'admin-btn-primary' : 'bg-white/10 text-white/50 cursor-not-allowed rounded-md'}`}
           data-testid="add-new-hero-slide-btn"
+          disabled={!canAddNew}
         >
-          + Add New Hero Slide
+          {canAddNew ? '+ Add New Hero Slide' : `Max ${MAX_SLIDES} Slides Reached`}
         </button>
       </div>
 
+      {(!editingId && !canAddNew) ? (
+        <div className="admin-card text-center py-8 text-[var(--muted)] text-sm">
+          Maximum of {MAX_SLIDES} hero slides allowed. Please delete or edit an existing slide.
+        </div>
+      ) : (
       <div className="admin-card" id="hero-slide-form">
         <div className="flex items-center justify-between mb-4">
           <h4 className="text-base font-bold">
@@ -249,6 +262,7 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
           </div>
         </form>
       </div>
+      )}
 
       <div className="admin-card">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
@@ -293,9 +307,11 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
         </div>
 
         <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
-          {paginatedSlides.map((slide, idx) => (
+          {paginatedSlides.map((slide, idx) => {
+            const slideId = slide.id || (slide as any)._id;
+            return (
             <div
-              key={slide.id || idx}
+              key={slideId || idx}
               className="bg-[var(--bg)] border border-[var(--border)] rounded-lg overflow-hidden"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -312,21 +328,22 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
                   <button
                     className="admin-btn-edit"
                     onClick={() => handleEdit(slide)}
-                    disabled={deletingId === slide.id}
+                    disabled={deletingId === slideId}
                   >
                     Edit
                   </button>
                   <button
                     className="admin-btn-danger"
-                    onClick={() => handleDelete(slide.id)}
-                    disabled={deletingId === slide.id}
+                    onClick={() => handleDelete(slideId)}
+                    disabled={deletingId === slideId}
                   >
-                    {deletingId === slide.id ? 'Deleting...' : 'Delete'}
+                    {deletingId === slideId ? 'Deleting...' : 'Delete'}
                   </button>
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

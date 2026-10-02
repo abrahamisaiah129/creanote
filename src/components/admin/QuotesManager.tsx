@@ -36,7 +36,7 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
   };
 
   const handleEdit = (q: QuoteData) => {
-    setEditingId(q.id || null);
+    setEditingId(q.id || (q as any)._id || null);
     setImageUrl(q.imageUrl || '');
     setIsActive(!!q.isActive);
     setQuoteText(q.quoteText || '');
@@ -47,10 +47,11 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
   };
 
   const handleToggleHero = async (q: QuoteData) => {
-    if (!q.id) return;
+    const quoteId = q.id || (q as any)._id;
+    if (!quoteId) return;
     setStatus('Updating quote status...');
     try {
-      const res = await fetch(`/api/quotes/${q.id}`, {
+      const res = await fetch(`/api/quotes/${quoteId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...q, isActive: !q.isActive }),
@@ -293,8 +294,10 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--border)]">
-                  {paginatedQuotes.map((q, idx) => (
-                    <tr key={q.id || idx} className="hover:bg-white/[0.02] transition">
+                  {paginatedQuotes.map((q, idx) => {
+                    const quoteId = q.id || (q as any)._id;
+                    return (
+                    <tr key={quoteId || idx} className="hover:bg-white/[0.02] transition">
                       <td className="px-4 py-3">
                         {q.imageUrl ? (
                            /* eslint-disable-next-line @next/next/no-img-element */
@@ -323,20 +326,21 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
                         <button
                           onClick={() => handleEdit(q)}
                           className="px-3 py-1.5 text-xs text-white bg-white/10 hover:bg-white/20 rounded mr-2 transition"
-                          disabled={deletingId === q.id}
+                          disabled={deletingId === quoteId}
                         >
                           Edit
                         </button>
                         <button
-                          onClick={() => handleDelete(q.id)}
+                          onClick={() => handleDelete(quoteId)}
                           className="px-3 py-1.5 text-xs text-[var(--orange)] bg-[var(--orange)]/10 hover:bg-[var(--orange)]/20 rounded transition"
-                          disabled={deletingId === q.id}
+                          disabled={deletingId === quoteId}
                         >
-                          {deletingId === q.id ? 'Del...' : 'Del'}
+                          {deletingId === quoteId ? 'Del...' : 'Del'}
                         </button>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
