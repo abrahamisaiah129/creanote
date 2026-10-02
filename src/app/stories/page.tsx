@@ -17,7 +17,7 @@ export default function StoriesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalPosts, setTotalPosts] = useState(0);
-  const [dynamicCategories, setDynamicCategories] = useState<string[]>(['ALL']);
+  const [dynamicCategories, setDynamicCategories] = useState<string[]>(['ALL', 'FEATURES', 'CONVO WITH A CREATIVE', 'PROJECT FEATURES']);
   const [dynamicAuthors, setDynamicAuthors] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -66,7 +66,6 @@ export default function StoriesPage() {
           setPosts(payload.data);
           setTotalPages(payload.totalPages || 1);
           setTotalPosts(payload.total || 0);
-          if (payload.categories) setDynamicCategories(['ALL', ...payload.categories]);
           if (payload.authors) setDynamicAuthors(payload.authors);
         }
       }

@@ -9,6 +9,10 @@ export interface QuoteData {
   createdAt?: string | Date;
   isActive?: boolean;
   order?: number;
+  quoteText?: string;
+  name?: string;
+  avatarUrl?: string;
+  meaning?: string;
 }
 
 interface QuoteBandProps {

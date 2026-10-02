@@ -20,6 +20,7 @@ export interface IPost extends Document {
   featureText?: string;
   isFeatured?: boolean;
   isTopOnTheList?: boolean;
+  gallery?: string[];
   createdAt: Date;
 }
 
@@ -43,6 +44,7 @@ const PostSchema: Schema = new Schema({
   featureText: { type: String },
   isFeatured: { type: Boolean, default: false },
   isTopOnTheList: { type: Boolean, default: false },
+  gallery: { type: [String], default: [] },
   createdAt: { type: Date, default: Date.now },
 });
 

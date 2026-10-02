@@ -24,6 +24,7 @@ export interface PostData {
   readTime?: string;
   content?: string;
   tags?: string[];
+  gallery?: string[];
   page?: number;
   order?: number;
 }

@@ -27,6 +27,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
   const [authorAvatar, setAuthorAvatar] = useState('');
   const [status, setStatus] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const resetForm = () => {
     setEditingId(null);
@@ -62,6 +63,8 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
     if (!id) return;
     if (!confirm('Are you sure you want to delete this story?')) return;
 
+    setDeletingId(id);
+    setStatus('Deleting...');
     try {
       const res = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -72,19 +75,22 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
     } catch (e) {
       console.error(e);
       setStatus('Error deleting story.');
+    } finally {
+      setDeletingId(null);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
+    setStatus('Saving...');
 
     const payload = {
       date,
       headline,
       sub,
       content,
-      thumbUrl: isFeatureBadge ? '' : thumbUrl,
+      thumbUrl,
       authorAvatar,
       isFeatureBadge,
       featureText: isFeatureBadge ? featureText : '',
@@ -169,6 +175,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
                 Date
               </label>
               <input
+                type="date"
                 className="admin-input"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
@@ -281,28 +288,28 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
               </div>
             </div>
             <div>
-              {isFeatureBadge ? (
+              {isFeatureBadge && (
                 <>
                   <label className="text-xs text-[var(--muted)] uppercase">
                     Feature Card Text
                   </label>
                   <input
-                    className="admin-input"
+                    className="admin-input mb-4"
                     value={featureText}
                     onChange={(e) => setFeatureText(e.target.value)}
                     placeholder="Creanote\nFeature"
                   />
                 </>
-              ) : (
-                <ImageUploadField
-                  label="Thumbnail / Cover (640x360)"
-                  value={thumbUrl}
-                  onChange={setThumbUrl}
-                  fallbackPlaceholder={placeholderUrl('Post thumbnail', 640, 360)}
-                  testId="post-thumb-input"
-                  aspectRatioHint="Recommended: 16:9 widescreen thumbnail"
-                />
               )}
+              <div className="text-[11px] text-[var(--muted)] mb-2">Note: Please upload an image to represent this story or feature card.</div>
+              <ImageUploadField
+                label="Thumbnail / Cover (640x360)"
+                value={thumbUrl}
+                onChange={setThumbUrl}
+                fallbackPlaceholder={placeholderUrl('Post thumbnail', 640, 360)}
+                testId="post-thumb-input"
+                aspectRatioHint="Recommended: 16:9 widescreen thumbnail"
+              />
             </div>
           </div>
 
@@ -385,9 +392,16 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
                   <td className="text-[var(--muted)]">{post.sub}</td>
                   <td>
                     {post.isFeatureBadge ? (
-                      <span className="text-[var(--green)] text-xs font-bold">
-                        [Feature Card]
-                      </span>
+                      <div className="relative inline-block w-[50px] h-[30px]">
+                        <img
+                          src={post.thumbUrl || placeholderUrl('Feature', 640, 360)}
+                          alt={post.headline}
+                          className="w-full h-full object-cover rounded opacity-40 mix-blend-luminosity"
+                        />
+                        <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
+                      </div>
                     ) : post.thumbUrl ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
@@ -405,6 +419,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
                         className="admin-btn-edit"
                         onClick={() => handleEdit(post)}
                         data-testid={`edit-post-btn-${idx}`}
+                        disabled={deletingId === post.id}
                       >
                         Edit
                       </button>
@@ -412,8 +427,9 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
                         className="admin-btn-danger"
                         onClick={() => handleDelete(post.id)}
                         data-testid={`delete-post-btn-${idx}`}
+                        disabled={deletingId === post.id}
                       >
-                        Delete
+                        {deletingId === post.id ? 'Del...' : 'Delete'}
                       </button>
                     </div>
                   </td>

@@ -85,7 +85,11 @@ export async function POST(req: Request) {
 
     const newQuote = await Quote.create({
       imageUrl,
-      isActive
+      isActive,
+      quoteText: body.quoteText || '',
+      name: body.name || '',
+      avatarUrl: body.avatarUrl || '',
+      meaning: body.meaning || ''
     });
 
     return NextResponse.json({ quote: newQuote }, { status: 201 });

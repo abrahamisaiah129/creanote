@@ -16,13 +16,22 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState('');
   const [isActive, setIsActive] = useState(false);
+  const [quoteText, setQuoteText] = useState('');
+  const [name, setName] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
+  const [meaning, setMeaning] = useState('');
   const [status, setStatus] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const resetForm = () => {
     setEditingId(null);
     setImageUrl('');
     setIsActive(false);
+    setQuoteText('');
+    setName('');
+    setAvatarUrl('');
+    setMeaning('');
     setStatus('');
   };
 
@@ -30,6 +39,10 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
     setEditingId(q.id || null);
     setImageUrl(q.imageUrl || '');
     setIsActive(!!q.isActive);
+    setQuoteText(q.quoteText || '');
+    setName(q.name || '');
+    setAvatarUrl(q.avatarUrl || '');
+    setMeaning(q.meaning || '');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -57,6 +70,8 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
     if (!id) return;
     if (!confirm('Are you sure you want to delete this quote?')) return;
 
+    setDeletingId(id);
+    setStatus('Deleting...');
     try {
       const res = await fetch(`/api/quotes/${id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -67,16 +82,23 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
     } catch (e) {
       console.error(e);
       setStatus('Error deleting quote.');
+    } finally {
+      setDeletingId(null);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
+    setStatus('Saving...');
 
     const payload = {
       imageUrl,
       isActive,
+      quoteText,
+      name,
+      avatarUrl,
+      meaning
     };
 
     try {
@@ -156,6 +178,57 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
             onChange={setImageUrl}
           />
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            <div>
+              <label className="text-xs text-[var(--muted)] uppercase mb-1.5 block">
+                User Name (Optional)
+              </label>
+              <input
+                type="text"
+                className="admin-input"
+                placeholder="e.g. John Doe"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-xs text-[var(--muted)] uppercase mb-1.5 block">
+                User Avatar URL (Optional)
+              </label>
+              <input
+                type="text"
+                className="admin-input"
+                placeholder="https://example.com/avatar.png"
+                value={avatarUrl}
+                onChange={(e) => setAvatarUrl(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="mb-5">
+            <label className="text-xs text-[var(--muted)] uppercase mb-1.5 block">
+              Quote Text
+            </label>
+            <textarea
+              className="admin-input min-h-[80px]"
+              placeholder="Enter quote text..."
+              value={quoteText}
+              onChange={(e) => setQuoteText(e.target.value)}
+            />
+          </div>
+
+          <div className="mb-5">
+            <label className="text-xs text-[var(--muted)] uppercase mb-1.5 block">
+              What does this mean to you? (Optional)
+            </label>
+            <textarea
+              className="admin-input min-h-[80px]"
+              placeholder="User's reflection..."
+              value={meaning}
+              onChange={(e) => setMeaning(e.target.value)}
+            />
+          </div>
+
           <div className="mb-6 flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-lg">
             <div>
               <div className="font-bold text-sm mb-1">Make Active</div>
@@ -189,7 +262,7 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
               className="admin-btn-primary flex items-center justify-center min-w-[120px]"
               data-testid="quote-submit-btn"
             >
-              {isSaving ? <DotsLoader /> : editingId ? 'Update Quote' : 'Create Quote'}
+              {isSaving ? <DotsLoader /> : editingId ? 'Update Quote' : 'Add Quote'}
             </button>
           </div>
           {status && (
@@ -250,14 +323,16 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
                         <button
                           onClick={() => handleEdit(q)}
                           className="px-3 py-1.5 text-xs text-white bg-white/10 hover:bg-white/20 rounded mr-2 transition"
+                          disabled={deletingId === q.id}
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDelete(q.id)}
                           className="px-3 py-1.5 text-xs text-[var(--orange)] bg-[var(--orange)]/10 hover:bg-[var(--orange)]/20 rounded transition"
+                          disabled={deletingId === q.id}
                         >
-                          Del
+                          {deletingId === q.id ? 'Del...' : 'Del'}
                         </button>
                       </td>
                     </tr>

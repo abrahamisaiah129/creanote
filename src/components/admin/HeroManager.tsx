@@ -25,6 +25,7 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
   const [linkUrl, setLinkUrl] = useState('');
   const [status, setStatus] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const resetForm = () => {
     setEditingId(null);
@@ -56,6 +57,8 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
     if (!id) return;
     if (!confirm('Are you sure you want to delete this hero slide?')) return;
 
+    setDeletingId(id);
+    setStatus('Deleting...');
     try {
       const res = await fetch(`/api/hero-slides/${id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -66,12 +69,15 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
     } catch (e) {
       console.error(e);
       setStatus('Error deleting slide.');
+    } finally {
+      setDeletingId(null);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
+    setStatus('Saving...');
 
     const payload = { imageUrl, mobileImageUrl, alt, title, meta, badgeText, headline, linkUrl };
 
@@ -129,7 +135,7 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
           className="admin-btn-primary text-xs py-2 px-3.5"
           data-testid="add-new-hero-slide-btn"
         >
-          + Add Hero Slide
+          + Add New Hero Slide
         </button>
       </div>
 
@@ -228,7 +234,7 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
 
           <div className="flex gap-3 items-center">
             <button type="submit" className="admin-btn-primary" disabled={isSaving} data-testid="hero-submit-btn">
-              {isSaving ? <DotsLoader /> : (editingId ? 'Save Changes' : 'Add Slide')}
+              {isSaving ? <DotsLoader /> : (editingId ? 'Save Changes' : 'Save')}
             </button>
             {editingId && (
               <button type="button" className="admin-tab-btn" onClick={resetForm}>
@@ -281,7 +287,7 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
               }}
               className="admin-btn-primary text-xs py-1.5 px-3"
             >
-              + Add Hero Slide
+              + Add New Hero Slide
             </button>
           </div>
         </div>
@@ -306,14 +312,16 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
                   <button
                     className="admin-btn-edit"
                     onClick={() => handleEdit(slide)}
+                    disabled={deletingId === slide.id}
                   >
                     Edit
                   </button>
                   <button
                     className="admin-btn-danger"
                     onClick={() => handleDelete(slide.id)}
+                    disabled={deletingId === slide.id}
                   >
-                    Delete
+                    {deletingId === slide.id ? 'Deleting...' : 'Delete'}
                   </button>
                 </div>
               </div>

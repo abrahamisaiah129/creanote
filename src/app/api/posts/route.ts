@@ -121,7 +121,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { date, headline, sub, thumbUrl, isFeatureBadge, featureText, authorAvatar } = body;
+    const { date, headline, sub, thumbUrl, isFeatureBadge, featureText, authorAvatar, gallery } = body;
 
     if (!headline || !date || !sub) {
       return NextResponse.json(
@@ -146,6 +146,7 @@ export async function POST(req: Request) {
       authorAvatar: authorAvatar || '',
       isFeatureBadge: !!isFeatureBadge,
       featureText: featureText || '',
+      gallery: Array.isArray(gallery) ? gallery : [],
     });
 
     return NextResponse.json(newPost, { status: 201 });

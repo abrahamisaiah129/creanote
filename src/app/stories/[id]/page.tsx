@@ -241,6 +241,27 @@ export default function StoryDetailPage() {
             </div>
           </div>
         </button>
+
+        {/* Gallery Section */}
+        {post.gallery && post.gallery.length > 0 && (
+          <div className="mt-14 w-full">
+            <h3 className="mb-6 font-['Ubuntu'] text-2xl font-bold text-white">
+              Project Gallery
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {post.gallery.map((img, idx) => (
+                <div key={idx} className="relative aspect-square w-full overflow-hidden rounded-[16px] border border-white/10 bg-[#0c1510]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={img}
+                    alt={`${post.headline} gallery image ${idx + 1}`}
+                    className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </article>
 
       {/* Related Stories Section */}

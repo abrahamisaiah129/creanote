@@ -123,7 +123,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
           <div className="p-3">
             <div className="flex items-center gap-3">
               {/* Image Preview Box */}
-              <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black">
+              <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={value}
@@ -181,7 +181,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
               <UploadCloud size={18} />
             </div>
             <p className="mt-2 text-xs font-bold text-white">
-              {isUploading ? 'Uploading image...' : 'Click to upload image or drag & drop'}
+              {isUploading ? 'Uploading image...' : 'Click to upload post image thumbnail or drag & drop'}
             </p>
             <p className="mt-0.5 text-[11px] text-[var(--muted)]">
               {aspectRatioHint}
@@ -212,7 +212,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
             type="text"
             value={value || ''}
             onChange={(e) => onChange(e.target.value)}
-            placeholder="https://..."
+            placeholder="https://... (Image URL)"
             className="w-full rounded-xl border border-white/10 bg-[#121c16] py-1.5 pl-3 pr-8 font-['Ubuntu'] text-xs text-white placeholder:text-neutral-500 outline-none transition focus:border-[var(--green)]"
             data-testid={testId}
           />

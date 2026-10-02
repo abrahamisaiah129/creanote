@@ -119,7 +119,7 @@ export const NewsletterBand: React.FC<NewsletterBandProps> = ({
                 onSubmit={handleSubmit}
               >
                 <input
-                  className="h-full min-w-0 flex-1 bg-[#D9D9D9] px-3 md:px-3.5 text-xs md:text-[13px] font-['Ubuntu'] font-normal text-[#131917] placeholder:italic placeholder:text-[#525252] outline-none border-none"
+                  className="h-full min-w-0 flex-1 bg-black/20 focus:bg-white px-3 md:px-3.5 text-xs md:text-[13px] font-['Ubuntu'] font-normal text-white focus:text-[#131917] placeholder:italic placeholder:text-white/60 focus:placeholder:text-[#525252] outline-none border-none transition-colors"
                   type="email"
                   placeholder="officialcreanote@gmail.com"
                   value={email}

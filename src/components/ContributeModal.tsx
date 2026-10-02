@@ -183,6 +183,10 @@ export const ContributeModal: React.FC<ContributeModalProps> = ({
         body: JSON.stringify({
           imageUrl: finalImage,
           isActive: false, // Default to inactive until approved by admin
+          quoteText: note,
+          name: name,
+          avatarUrl: storyThumbUrl,
+          meaning: headline
         }),
       });
 
@@ -414,13 +418,61 @@ export const ContributeModal: React.FC<ContributeModalProps> = ({
                   </div>
                 </div>
 
+                <div className="mt-2 space-y-3.5">
+                  <div>
+                    <label className="font-['Ubuntu'] text-xs uppercase text-[var(--muted)]">
+                      User's Name
+                    </label>
+                    <input
+                      className="mt-1.5 h-11 w-full rounded-xl border border-white/10 bg-[#121c16] px-3.5 font-['Ubuntu'] text-xs text-white placeholder:text-neutral-500 outline-none transition focus:border-[var(--green)]"
+                      placeholder="e.g. John Doe"
+                      value={name || ''}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="font-['Ubuntu'] text-xs uppercase text-[var(--muted)]">
+                      Their Image URL (Optional)
+                    </label>
+                    <input
+                      type="url"
+                      className="mt-1.5 h-11 w-full rounded-xl border border-white/10 bg-[#121c16] px-3.5 font-['Ubuntu'] text-xs text-white placeholder:text-neutral-500 outline-none transition focus:border-[var(--green)]"
+                      placeholder="https://example.com/avatar.png"
+                      value={storyThumbUrl || ''}
+                      onChange={(e) => setStoryThumbUrl(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="font-['Ubuntu'] text-xs uppercase text-[var(--muted)]">
+                      Quote Text
+                    </label>
+                    <textarea
+                      className="mt-1.5 min-h-[80px] w-full resize-y rounded-xl border border-white/10 bg-[#121c16] p-3 font-['Ubuntu'] text-xs text-white placeholder:text-neutral-500 outline-none transition focus:border-[var(--green)] leading-relaxed"
+                      placeholder="Enter the quote text here..."
+                      value={note || ''}
+                      onChange={(e) => setNote(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="font-['Ubuntu'] text-xs uppercase text-[var(--muted)]">
+                      What does this quote mean to you? (optional)
+                    </label>
+                    <textarea
+                      className="mt-1.5 min-h-[80px] w-full resize-y rounded-xl border border-white/10 bg-[#121c16] p-3 font-['Ubuntu'] text-xs text-white placeholder:text-neutral-500 outline-none transition focus:border-[var(--green)] leading-relaxed"
+                      placeholder="Share your reflection..."
+                      value={headline || ''}
+                      onChange={(e) => setHeadline(e.target.value)}
+                    />
+                  </div>
+                </div>
+
                 <button
                   type="submit"
-                  className="mt-2 flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-[var(--green)] font-['Ubuntu'] text-xs font-bold text-black shadow-lg transition hover:bg-[var(--green-dark)] active:scale-98 disabled:opacity-50"
+                  className="mt-4 flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-[var(--green)] font-['Ubuntu'] text-xs font-bold text-black shadow-lg transition hover:bg-[var(--green-dark)] active:scale-98 disabled:opacity-50"
                   disabled={status === 'submitting'}
                   data-testid="quote-submit-btn"
                 >
-                  {status === 'submitting' ? <DotsLoader /> : 'Submit Quote & Visual'}
+                  {status === 'submitting' ? <DotsLoader /> : 'Submit Quote'}
                 </button>
               </form>
             ) : (
