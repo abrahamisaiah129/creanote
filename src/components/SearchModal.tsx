@@ -292,7 +292,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                         onClick={onClose}
                         className="group flex items-start gap-3 rounded-xl border border-white/5 bg-[#0f1712] p-3.5 transition hover:border-[var(--green)]/40 hover:bg-[#131f18] no-underline text-inherit"
                       >
-                        {p.thumbUrl && !p.isFeatureBadge ? (
+                        {p.thumbUrl ? (
                           /* eslint-disable-next-line @next/next/no-img-element */
                           <img
                             src={p.thumbUrl}

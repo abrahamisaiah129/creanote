@@ -20,8 +20,6 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
   const [headline, setHeadline] = useState('');
   const [sub, setSub] = useState('');
   const [thumbUrl, setThumbUrl] = useState(placeholderUrl('Post thumbnail', 640, 360));
-  const [isFeatureBadge, setIsFeatureBadge] = useState(false);
-  const [featureText, setFeatureText] = useState('Creanote\nFeature');
   const [isFeatured, setIsFeatured] = useState(false);
   const [isTopOnTheList, setIsTopOnTheList] = useState(false);
   const [content, setContent] = useState('');
@@ -36,8 +34,6 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
     setHeadline('');
     setSub('');
     setThumbUrl(placeholderUrl('Post thumbnail', 640, 360));
-    setIsFeatureBadge(false);
-    setFeatureText('Creanote\nFeature');
     setIsFeatured(false);
     setIsTopOnTheList(false);
     setContent('');
@@ -51,8 +47,6 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
     setHeadline(post.headline);
     setSub(post.sub);
     setThumbUrl(post.thumbUrl || '');
-    setIsFeatureBadge(!!post.isFeatureBadge);
-    setFeatureText(post.featureText || 'Creanote\nFeature');
     setIsFeatured(!!post.isFeatured);
     setIsTopOnTheList(!!post.isTopOnTheList);
     setContent(post.content || '');
@@ -93,8 +87,6 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
       content,
       thumbUrl,
       authorAvatar,
-      isFeatureBadge,
-      featureText: isFeatureBadge ? featureText : '',
       isFeatured,
       isTopOnTheList,
     };
@@ -264,44 +256,8 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
             </label>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_120px] gap-4 mb-5">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_120px] gap-4 mb-5">
             <div>
-              <label className="text-xs text-[var(--muted)] uppercase">
-                Thumbnail Mode
-              </label>
-              <div className="flex gap-4 mt-[10px]">
-                <label className="flex items-center gap-[6px] text-[13px]">
-                  <input
-                    type="radio"
-                    checked={!isFeatureBadge}
-                    onChange={() => setIsFeatureBadge(false)}
-                  />
-                  Image Thumbnail
-                </label>
-                <label className="flex items-center gap-[6px] text-[13px]">
-                  <input
-                    type="radio"
-                    checked={isFeatureBadge}
-                    onChange={() => setIsFeatureBadge(true)}
-                  />
-                  Green Feature Card
-                </label>
-              </div>
-            </div>
-            <div>
-              {isFeatureBadge && (
-                <>
-                  <label className="text-xs text-[var(--muted)] uppercase">
-                    Feature Card Text
-                  </label>
-                  <input
-                    className="admin-input mb-4"
-                    value={featureText}
-                    onChange={(e) => setFeatureText(e.target.value)}
-                    placeholder="Creanote\nFeature"
-                  />
-                </>
-              )}
               <div className="text-[11px] text-[var(--muted)] mb-2">Note: Please upload an image to represent this story or feature card.</div>
               <ImageUploadField
                 label="Thumbnail / Cover (640x360)"
@@ -394,18 +350,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
                   <td className="font-semibold max-w-[300px]">{post.headline}</td>
                   <td className="text-[var(--muted)]">{post.sub}</td>
                   <td>
-                    {post.isFeatureBadge ? (
-                      <div className="relative inline-block w-[50px] h-[30px]">
-                        <img
-                          src={post.thumbUrl || placeholderUrl('Feature', 640, 360)}
-                          alt={post.headline}
-                          className="w-full h-full object-cover rounded opacity-40 mix-blend-luminosity"
-                        />
-                        <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                        </svg>
-                      </div>
-                    ) : post.thumbUrl ? (
+                    {post.thumbUrl ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
                         src={post.thumbUrl}
