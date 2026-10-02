@@ -6,6 +6,7 @@ import { placeholderUrl } from '@/lib/defaultData';
 import { ImageUploadField } from '../ImageUploadField';
 import { DotsLoader } from '../DotsLoader';
 import { useActivityLog } from '@/context/ActivityLogContext';
+import { formatDate } from '@/utils/formatDate';
 
 interface PostsManagerProps {
   posts: PostData[];
@@ -15,7 +16,7 @@ interface PostsManagerProps {
 export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) => {
   const { addLog } = useActivityLog();
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [date, setDate] = useState('JAN 25');
+  const [date, setDate] = useState('');
   const [headline, setHeadline] = useState('');
   const [sub, setSub] = useState('');
   const [thumbUrl, setThumbUrl] = useState(placeholderUrl('Post thumbnail', 640, 360));
@@ -31,7 +32,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
 
   const resetForm = () => {
     setEditingId(null);
-    setDate('JAN 25');
+    setDate('');
     setHeadline('');
     setSub('');
     setThumbUrl(placeholderUrl('Post thumbnail', 640, 360));
@@ -387,7 +388,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
             <tbody>
               {paginatedPosts.map((post, idx) => (
                 <tr key={post.id || idx}>
-                  <td className="text-[var(--orange)] font-bold">{post.date}</td>
+                  <td className="text-[var(--orange)] font-bold">{formatDate(post.date)}</td>
                   <td className="font-semibold max-w-[300px]">{post.headline}</td>
                   <td className="text-[var(--muted)]">{post.sub}</td>
                   <td>

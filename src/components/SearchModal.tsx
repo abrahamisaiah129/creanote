@@ -6,6 +6,7 @@ import { Search, X, ArrowUpRight } from "lucide-react";
 import { PostData } from "./PostRow";
 import { TopCardData } from "./TopCard";
 import { QuoteData } from "./QuoteBand";
+import { formatDate } from "@/utils/formatDate";
 
 export interface SearchModalProps {
   isOpen: boolean;
@@ -306,7 +307,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[var(--orange)]/15 text-[var(--orange)]">
-                              {p.date}
+                              {formatDate(p.date)}
                             </span>
                             {p.category && (
                               <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[var(--green)]/15 text-[var(--green)]">

@@ -11,6 +11,7 @@ import { Pagination } from '@/components/Pagination';
 import { PostData } from '@/components/PostRow';
 import { placeholderUrl } from '@/lib/defaultData';
 import { Clock, ArrowUpRight, BookOpen, PlusCircle, Search, X, SlidersHorizontal } from 'lucide-react';
+import { formatDate } from '@/utils/formatDate';
 
 export default function StoriesPage() {
   const [posts, setPosts] = useState<PostData[]>([]);
@@ -394,7 +395,7 @@ export default function StoriesPage() {
                     {/* Date & Read Time */}
                     <div className="flex items-center gap-3 text-xs">
                       <span className="font-['Ubuntu'] font-bold uppercase tracking-wider text-[var(--orange)]">
-                        {post.date}
+                        {formatDate(post.date)}
                       </span>
                       <span className="h-1 w-1 rounded-full bg-[var(--muted)]" />
                       <span className="flex items-center gap-1 text-[var(--muted)]">

@@ -12,6 +12,7 @@ import { PostData } from '@/components/PostRow';
 import { placeholderUrl } from '@/lib/defaultData';
 import { ArrowLeft, Clock, Calendar, Share2, ArrowUpRight, X } from 'lucide-react';
 import { DotsLoader } from '@/components/DotsLoader';
+import { formatDate } from '@/utils/formatDate';
 export default function StoryDetailPage() {
   const params = useParams();
   const idOrSlug = params?.id as string;
@@ -154,7 +155,7 @@ export default function StoryDetailPage() {
           <div className="flex items-center gap-4 text-xs text-[var(--muted)]">
             <span className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[var(--orange)]">
               <Calendar size={13} />
-              {post.date}
+              {formatDate(post.date)}
             </span>
             <span className="flex items-center gap-1.5">
               <Clock size={13} />
@@ -303,7 +304,7 @@ export default function StoryDetailPage() {
                     {rel.headline}
                   </div>
                   <div className="mt-1 text-xs text-[var(--orange)] font-bold">
-                    {rel.date}
+                    {formatDate(rel.date)}
                   </div>
                 </Link>
               ))}

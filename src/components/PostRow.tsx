@@ -62,9 +62,15 @@ export const PostRow: React.FC<PostRowProps> = ({ post, onClick }) => {
       </div>
 
       <div className="flex flex-1 flex-col md:flex-row md:items-center gap-2 md:gap-4 lg:gap-8 min-w-0">
-        {/* Date */}
         <div className="font-['Ubuntu'] text-xs font-bold uppercase tracking-wider text-[var(--orange)] md:w-[80px] shrink-0">
-          {post.date}
+          {(() => {
+            if (/^\d{4}-\d{2}-\d{2}$/.test(post.date)) {
+              const d = new Date(post.date);
+              const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+              return `${months[d.getMonth()]} ${String(d.getDate()).padStart(2, '0')}`;
+            }
+            return post.date;
+          })()}
         </div>
 
         {/* Headline & Subtitle */}
