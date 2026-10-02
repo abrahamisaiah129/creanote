@@ -3,6 +3,8 @@ import { connectToDatabase } from '@/lib/mongodb';
 import { Quote } from '@/models/Quote';
 import { defaultQuotes } from '@/lib/defaultData';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: Request) {
   try {
     let page = 1;

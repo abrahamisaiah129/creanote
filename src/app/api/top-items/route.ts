@@ -3,6 +3,8 @@ import { connectToDatabase } from '@/lib/mongodb';
 import { TopItem } from '@/models/TopItem';
 import { defaultTopItems } from '@/lib/defaultData';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: Request) {
   try {
     let search = '';

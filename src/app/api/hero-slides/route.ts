@@ -3,6 +3,8 @@ import { connectToDatabase } from '@/lib/mongodb';
 import { HeroSlide } from '@/models/HeroSlide';
 import { defaultHeroSlides } from '@/lib/defaultData';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: Request) {
   try {
     const conn = await connectToDatabase();

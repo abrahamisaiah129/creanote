@@ -30,6 +30,7 @@ export default function QuotesPage() {
         paginated: 'true',
         page: page.toString(),
         limit: PAGE_SIZE.toString(),
+        t: Date.now().toString(),
       });
 
       const res = await fetch(`/api/quotes?${params.toString()}`);

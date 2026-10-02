@@ -60,12 +60,13 @@ export default function AdminPage() {
   const fetchAllData = useCallback(async () => {
     setIsLoading(true);
     try {
+      const t = Date.now();
       const [topRes, postsRes, quotesRes, heroRes, subRes] = await Promise.all([
-        fetch('/api/top-items'),
-        fetch('/api/posts'),
-        fetch('/api/quotes'),
-        fetch('/api/hero-slides'),
-        fetch('/api/newsletter'),
+        fetch(`/api/top-items?t=${t}`),
+        fetch(`/api/posts?t=${t}`),
+        fetch(`/api/quotes?t=${t}`),
+        fetch(`/api/hero-slides?t=${t}`),
+        fetch(`/api/newsletter?t=${t}`),
       ]);
 
       if (topRes.ok) {

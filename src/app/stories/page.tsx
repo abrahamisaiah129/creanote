@@ -59,6 +59,7 @@ export default function StoriesPage() {
       if (authorFilter !== 'ALL') params.append('author', authorFilter);
       if (readingTimeFilter !== 'ALL') params.append('readingTime', readingTimeFilter);
       if (searchQuery.trim()) params.append('search', searchQuery.trim());
+      params.append('t', Date.now().toString());
 
       const res = await fetch(`/api/posts?${params.toString()}`);
       if (res.ok) {
