@@ -32,6 +32,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
   const [content, setContent] = useState("");
   const [authorAvatar, setAuthorAvatar] = useState("");
   const [status, setStatus] = useState("");
+  const [isError, setIsError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -47,6 +48,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
     setContent("");
     setAuthorAvatar("");
     setStatus("");
+    setIsError(false);
   };
 
   const handleEdit = (post: PostData) => {
@@ -67,9 +69,15 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
   };
 
   const handleToggleFeature = async (post: PostData) => {
+    if (!post.isFeatured && posts.filter((p) => p.isFeatured).length >= 1) {
+      setIsError(true);
+      setStatus("Max reached: Only 1 story can be featured.");
+      return;
+    }
     const postId = post.id || (post as any)._id;
     if (!postId) return;
     setStatus("Updating feature status...");
+    setIsError(false);
     try {
       const res = await fetch(`/api/posts/${postId}`, {
         method: "PUT",
@@ -86,14 +94,21 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
       }
     } catch (e) {
       console.error(e);
+      setIsError(true);
       setStatus("Error updating story feature status.");
     }
   };
 
   const handleToggleTopOnTheList = async (post: PostData) => {
+    if (!post.isTopOnTheList && posts.filter((p) => p.isTopOnTheList).length >= 4) {
+      setIsError(true);
+      setStatus("Max reached: Only 4 stories can be Top on the List.");
+      return;
+    }
     const postId = post.id || (post as any)._id;
     if (!postId) return;
     setStatus("Updating Top on the List status...");
+    setIsError(false);
     try {
       const res = await fetch(`/api/posts/${postId}`, {
         method: "PUT",
@@ -110,6 +125,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
       }
     } catch (e) {
       console.error(e);
+      setIsError(true);
       setStatus("Error updating story Top on the List status.");
     }
   };
@@ -466,14 +482,10 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
                         <button
                           type="button"
                           onClick={() => handleToggleFeature(post)}
-                          disabled={
-                            !post.isFeatured &&
-                            posts.filter((p) => p.isFeatured).length >= 1
-                          }
                           className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md font-bold transition ${
                             post.isFeatured
                               ? "bg-[var(--green)]/20 text-[var(--green)] hover:bg-[var(--green)]/30"
-                              : "bg-white/5 text-[var(--muted)] hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                              : "bg-white/5 text-[var(--muted)] hover:bg-white/10 hover:text-white"
                           }`}
                         >
                           <svg
@@ -493,14 +505,10 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
                         <button
                           type="button"
                           onClick={() => handleToggleTopOnTheList(post)}
-                          disabled={
-                            !post.isTopOnTheList &&
-                            posts.filter((p) => p.isTopOnTheList).length >= 4
-                          }
                           className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md font-bold transition ${
                             post.isTopOnTheList
                               ? "bg-[var(--green)]/20 text-[var(--green)] hover:bg-[var(--green)]/30"
-                              : "bg-white/5 text-[var(--muted)] hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                              : "bg-white/5 text-[var(--muted)] hover:bg-white/10 hover:text-white"
                           }`}
                         >
                           <svg
@@ -553,7 +561,11 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
 
       <SuccessLightbox
         message={status}
-        onClose={() => setStatus("")}
+        isError={isError}
+        onClose={() => {
+          setStatus("");
+          setIsError(false);
+        }}
       />
     </div>
   );

@@ -27,6 +27,7 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
   const [headline, setHeadline] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
   const [status, setStatus] = useState('');
+  const [isError, setIsError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -42,6 +43,7 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
     setHeadline('');
     setLinkUrl('');
     setStatus('');
+    setIsError(false);
   };
 
   const handleEdit = (slide: SlideItem) => {
@@ -140,8 +142,9 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
         <button
           type="button"
           onClick={() => {
-            if (!canAddNew) {
-              alert(`Maximum of ${MAX_SLIDES} hero slides allowed.`);
+            if (!canAddNew && !editingId) {
+              setIsError(true);
+              setStatus(`Max reached: Maximum of ${MAX_SLIDES} hero slides allowed.`);
               return;
             }
             resetForm();
@@ -361,7 +364,11 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
 
       <SuccessLightbox
         message={status}
-        onClose={() => setStatus("")}
+        isError={isError}
+        onClose={() => {
+          setStatus("");
+          setIsError(false);
+        }}
       />
     </div>
   );

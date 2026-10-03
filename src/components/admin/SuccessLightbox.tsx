@@ -2,10 +2,11 @@ import React, { useEffect } from 'react';
 
 interface SuccessLightboxProps {
   message: string;
+  isError?: boolean;
   onClose: () => void;
 }
 
-export const SuccessLightbox: React.FC<SuccessLightboxProps> = ({ message, onClose }) => {
+export const SuccessLightbox: React.FC<SuccessLightboxProps> = ({ message, isError = false, onClose }) => {
   useEffect(() => {
     if (message) {
       const timer = setTimeout(() => {
@@ -29,13 +30,21 @@ export const SuccessLightbox: React.FC<SuccessLightboxProps> = ({ message, onClo
     );
   }
 
+  const iconColor = isError ? 'var(--orange)' : 'var(--green)';
+
   return (
     <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-md transition-all duration-300">
-      <div className="bg-[#0c120e] border border-[var(--border)] px-8 py-6 rounded-2xl shadow-2xl flex flex-col items-center transform scale-100 animate-in fade-in zoom-in duration-200">
-        <div className="w-12 h-12 bg-[var(--green)]/20 rounded-full flex items-center justify-center mb-4 border border-[var(--green)]/30">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
+      <div className="bg-[#0c120e] border border-[var(--border)] px-8 py-6 rounded-2xl shadow-2xl flex flex-col items-center transform scale-100 animate-in fade-in zoom-in duration-200 text-center max-w-sm w-[90%]">
+        <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 border`} style={{ backgroundColor: `color-mix(in srgb, ${iconColor} 20%, transparent)`, borderColor: `color-mix(in srgb, ${iconColor} 30%, transparent)` }}>
+          {isError ? (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          )}
         </div>
         <p className="text-white font-bold text-lg tracking-wide">{message}</p>
       </div>

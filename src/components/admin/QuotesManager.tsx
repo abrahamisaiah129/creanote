@@ -24,6 +24,7 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
   const [avatarUrl, setAvatarUrl] = useState('');
   const [meaning, setMeaning] = useState('');
   const [status, setStatus] = useState('');
+  const [isError, setIsError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [previewId, setPreviewId] = useState<string | null>(null);
@@ -38,6 +39,7 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
     setAvatarUrl('');
     setMeaning('');
     setStatus('');
+    setIsError(false);
   };
 
   const handleEdit = (q: QuoteData) => {
@@ -52,9 +54,16 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
   };
 
   const handleToggleHero = async (q: QuoteData) => {
+    if (!q.isActive && quotes.filter((quote) => quote.isActive).length >= 5) {
+      setIsError(true);
+      setStatus("Max reached: Only 5 quotes can be active at a time.");
+      return;
+    }
+
     const quoteId = q.id || (q as any)._id;
     if (!quoteId) return;
     setStatus('Updating quote status...');
+    setIsError(false);
     try {
       const res = await fetch(`/api/quotes/${quoteId}`, {
         method: 'PUT',
@@ -68,6 +77,7 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
       }
     } catch (e) {
       console.error(e);
+      setIsError(true);
       setStatus('Error updating quote.');
     }
   };
@@ -303,13 +313,24 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
                     ) : (
                       <div className="h-full w-full flex items-center justify-center text-xs text-[var(--muted)]">No Img</div>
                     )}
-                    {q.isActive && (
-                      <div className="absolute top-2 right-2">
-                        <span className="text-[10px] px-2 py-1 rounded-full font-bold border backdrop-blur-md bg-[var(--green)]/30 text-[var(--green)] border-[var(--green)]/50">
-                          Active
-                        </span>
-                      </div>
-                    )}
+                    <div className="absolute top-2 right-2 z-10">
+                      <button 
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          handleToggleHero(q); 
+                        }}
+                        className={`p-1.5 rounded-full backdrop-blur-md border transition ${
+                          q.isActive 
+                            ? 'bg-[var(--green)]/20 text-[var(--green)] border-[var(--green)]/50' 
+                            : 'bg-black/40 text-white/50 border-white/20 hover:text-white hover:bg-black/60'
+                        }`}
+                        title={q.isActive ? "Deactivate Quote" : "Activate Quote"}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill={q.isActive ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 );
               })}
@@ -410,7 +431,11 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
 
       <SuccessLightbox
         message={status}
-        onClose={() => setStatus("")}
+        isError={isError}
+        onClose={() => {
+          setStatus("");
+          setIsError(false);
+        }}
       />
     </div>
   );
