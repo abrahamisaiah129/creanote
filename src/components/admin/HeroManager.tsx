@@ -7,6 +7,9 @@ import { ImageUploadField } from '../ImageUploadField';
 import { DotsLoader } from '../DotsLoader';
 import { useActivityLog } from '@/context/ActivityLogContext';
 
+import { SuccessLightbox } from './SuccessLightbox';
+import { ConfirmLightbox } from './ConfirmLightbox';
+
 interface HeroManagerProps {
   slides: SlideItem[];
   onRefresh: () => void;
@@ -26,6 +29,7 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
   const [status, setStatus] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const resetForm = () => {
     setEditingId(null);
@@ -53,16 +57,21 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleDelete = async (id?: string) => {
+  const handleDelete = (id?: string) => {
     if (!id) return;
-    if (!confirm('Are you sure you want to delete this hero slide?')) return;
+    setConfirmDeleteId(id);
+  };
 
+  const performDelete = async () => {
+    if (!confirmDeleteId) return;
+    const id = confirmDeleteId;
+    setConfirmDeleteId(null);
     setDeletingId(id);
     setStatus('Deleting...');
     try {
       const res = await fetch(`/api/hero-slides/${id}`, { method: 'DELETE' });
       if (res.ok) {
-        setStatus('Hero slide deleted successfully.');
+        setStatus('Hero slide deleted successfully!');
         addLog('Deleted a hero slide', 'delete');
         onRefresh();
       }
@@ -254,11 +263,6 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
                 Cancel
               </button>
             )}
-            {status && (
-              <span className="text-[13px] text-[var(--green)]">
-                {status}
-              </span>
-            )}
           </div>
         </form>
       </div>
@@ -346,6 +350,19 @@ export const HeroManager: React.FC<HeroManagerProps> = ({ slides, onRefresh }) =
           })}
         </div>
       </div>
+      
+      <ConfirmLightbox
+        isOpen={!!confirmDeleteId}
+        title="Delete Slide?"
+        message="Are you sure you want to permanently delete this hero slide? This action cannot be undone."
+        onConfirm={performDelete}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
+
+      <SuccessLightbox
+        message={status}
+        onClose={() => setStatus("")}
+      />
     </div>
   );
 };

@@ -6,6 +6,8 @@ import { placeholderUrl } from "@/lib/defaultData";
 import { ImageUploadField } from "../ImageUploadField";
 import { DotsLoader } from "../DotsLoader";
 import { useActivityLog } from "@/context/ActivityLogContext";
+import { SuccessLightbox } from "./SuccessLightbox";
+import { ConfirmLightbox } from "./ConfirmLightbox";
 import { formatDate } from "@/utils/formatDate";
 
 interface PostsManagerProps {
@@ -32,6 +34,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
   const [status, setStatus] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const resetForm = () => {
     setEditingId(null);
@@ -46,10 +49,13 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
     setStatus("");
   };
 
-
   const handleEdit = (post: PostData) => {
     setEditingId(post.id || (post as any)._id || null);
-    setDate(post.date);
+    let setPostDate = post.date || new Date().toISOString();
+    if (setPostDate.includes("T")) {
+      setPostDate = setPostDate.split("T")[0];
+    }
+    setDate(setPostDate);
     setHeadline(post.headline);
     setSub(post.sub);
     setThumbUrl(post.thumbUrl || "");
@@ -74,7 +80,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
         setStatus(`Story ${!post.isFeatured ? "featured" : "unfeatured"}!`);
         addLog(
           `${!post.isFeatured ? "Featured" : "Unfeatured"} story: "${post.headline}"`,
-          "update"
+          "update",
         );
         onRefresh();
       }
@@ -84,16 +90,45 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
     }
   };
 
-  const handleDelete = async (id?: string) => {
-    if (!id) return;
-    if (!confirm("Are you sure you want to delete this story?")) return;
+  const handleToggleTopOnTheList = async (post: PostData) => {
+    const postId = post.id || (post as any)._id;
+    if (!postId) return;
+    setStatus("Updating Top on the List status...");
+    try {
+      const res = await fetch(`/api/posts/${postId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...post, isTopOnTheList: !post.isTopOnTheList }),
+      });
+      if (res.ok) {
+        setStatus(`Story ${!post.isTopOnTheList ? "added to Top List" : "removed from Top List"}!`);
+        addLog(
+          `${!post.isTopOnTheList ? "Added to" : "Removed from"} Top List: "${post.headline}"`,
+          "update"
+        );
+        onRefresh();
+      }
+    } catch (e) {
+      console.error(e);
+      setStatus("Error updating story Top on the List status.");
+    }
+  };
 
+  const handleDelete = (id?: string) => {
+    if (!id) return;
+    setConfirmDeleteId(id);
+  };
+
+  const performDelete = async () => {
+    if (!confirmDeleteId) return;
+    const id = confirmDeleteId;
+    setConfirmDeleteId(null);
     setDeletingId(id);
     setStatus("Deleting...");
     try {
       const res = await fetch(`/api/posts/${id}`, { method: "DELETE" });
       if (res.ok) {
-        setStatus("Story deleted successfully.");
+        setStatus("Story deleted successfully!");
         addLog("Deleted a story", "delete");
         onRefresh();
       }
@@ -157,9 +192,16 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
 
   const ITEMS_PER_PAGE = 5;
   const [currentTablePage, setCurrentTablePage] = useState(1);
-  const totalTablePages = Math.ceil(posts.length / ITEMS_PER_PAGE) || 1;
+  
+  const sortedPosts = [...posts].sort((a, b) => {
+    if (a.isFeatured && !b.isFeatured) return -1;
+    if (!a.isFeatured && b.isFeatured) return 1;
+    return 0;
+  });
+
+  const totalTablePages = Math.ceil(sortedPosts.length / ITEMS_PER_PAGE) || 1;
   const startIdx = (currentTablePage - 1) * ITEMS_PER_PAGE;
-  const paginatedPosts = posts.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+  const paginatedPosts = sortedPosts.slice(startIdx, startIdx + ITEMS_PER_PAGE);
 
   return (
     <div>
@@ -336,9 +378,6 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
                 Cancel
               </button>
             )}
-            {status && (
-              <span className="text-[13px] text-[var(--green)]">{status}</span>
-            )}
           </div>
         </form>
       </div>
@@ -427,17 +466,56 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
                         <button
                           type="button"
                           onClick={() => handleToggleFeature(post)}
-                          disabled={!post.isFeatured && posts.filter(p => p.isFeatured).length >= 1}
+                          disabled={
+                            !post.isFeatured &&
+                            posts.filter((p) => p.isFeatured).length >= 1
+                          }
                           className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md font-bold transition ${
                             post.isFeatured
-                              ? 'bg-[var(--green)]/20 text-[var(--green)] hover:bg-[var(--green)]/30'
-                              : 'bg-white/5 text-[var(--muted)] hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed'
+                              ? "bg-[var(--green)]/20 text-[var(--green)] hover:bg-[var(--green)]/30"
+                              : "bg-white/5 text-[var(--muted)] hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
                           }`}
                         >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill={post.isFeatured ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill={post.isFeatured ? "currentColor" : "none"}
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                           </svg>
-                          {post.isFeatured ? 'Featured' : 'Feature'}
+                          {post.isFeatured ? "Featured" : "Feature"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleTopOnTheList(post)}
+                          disabled={
+                            !post.isTopOnTheList &&
+                            posts.filter((p) => p.isTopOnTheList).length >= 4
+                          }
+                          className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md font-bold transition ${
+                            post.isTopOnTheList
+                              ? "bg-[var(--green)]/20 text-[var(--green)] hover:bg-[var(--green)]/30"
+                              : "bg-white/5 text-[var(--muted)] hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                          }`}
+                        >
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill={post.isTopOnTheList ? "currentColor" : "none"}
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                          Top List
                         </button>
                         <button
                           className="admin-btn-edit"
@@ -464,6 +542,19 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
           </table>
         </div>
       </div>
+      
+      <ConfirmLightbox
+        isOpen={!!confirmDeleteId}
+        title="Delete Story?"
+        message="Are you sure you want to permanently delete this story? This action cannot be undone."
+        onConfirm={performDelete}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
+
+      <SuccessLightbox
+        message={status}
+        onClose={() => setStatus("")}
+      />
     </div>
   );
 };

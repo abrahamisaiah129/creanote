@@ -36,8 +36,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       const currentHashLink = getHashLink.replace("#", "");
       return currentHashLink;
     };
-
-    handleTabClick(getHashlinkFromUrl());
+    if (window.location.hash) {
+      handleTabClick(getHashlinkFromUrl());
+    } else {
+      handleTabClick("overview");
+    }
   }, [searchParams]);
 
   const handleTabClick = (tabId: string) => {

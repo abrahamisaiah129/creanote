@@ -6,6 +6,9 @@ import { ImageUploadField } from '../ImageUploadField';
 import { DotsLoader } from '../DotsLoader';
 import { useActivityLog } from '@/context/ActivityLogContext';
 
+import { SuccessLightbox } from './SuccessLightbox';
+import { ConfirmLightbox } from './ConfirmLightbox';
+
 interface QuotesManagerProps {
   quotes: QuoteData[];
   onRefresh: () => void;
@@ -24,6 +27,7 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
   const [isSaving, setIsSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [previewId, setPreviewId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const resetForm = () => {
     setEditingId(null);
@@ -68,16 +72,21 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
     }
   };
 
-  const handleDelete = async (id?: string) => {
+  const handleDelete = (id?: string) => {
     if (!id) return;
-    if (!confirm('Are you sure you want to delete this quote?')) return;
+    setConfirmDeleteId(id);
+  };
 
+  const performDelete = async () => {
+    if (!confirmDeleteId) return;
+    const id = confirmDeleteId;
+    setConfirmDeleteId(null);
     setDeletingId(id);
     setStatus('Deleting...');
     try {
       const res = await fetch(`/api/quotes/${id}`, { method: 'DELETE' });
       if (res.ok) {
-        setStatus('Quote deleted successfully.');
+        setStatus('Quote deleted successfully!');
         addLog('Deleted a quote', 'delete');
         onRefresh();
       }
@@ -267,11 +276,6 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
               {isSaving ? <DotsLoader /> : editingId ? 'Update Quote' : 'Add Quote'}
             </button>
           </div>
-          {status && (
-            <p className="mt-4 text-xs font-bold text-[var(--green)] text-right">
-              {status}
-            </p>
-          )}
         </form>
       </div>
 
@@ -351,68 +355,37 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
                       >
                         <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                       </button>
+                      
                       {q.imageUrl && (
                         /* eslint-disable-next-line @next/next/no-img-element */
-                        <img src={q.imageUrl} alt="Preview" className="w-full rounded-t-lg object-contain max-h-[50vh] shadow-2xl bg-black" />
+                        <img src={q.imageUrl} alt="Preview" className="w-full rounded-lg object-contain max-h-[70vh] shadow-2xl" />
                       )}
                       
-                      <div className="w-full flex flex-col p-5 sm:p-6 bg-[#0a0f0c] border border-[var(--border)] rounded-b-lg shadow-2xl">
-                        {(q.quoteText || q.meaning || q.name) && (
-                          <div className="mb-6 flex flex-col gap-4">
-                            {(q.quoteText || q.meaning) && (
-                              <div className="flex flex-col gap-2">
-                                {q.quoteText && (
-                                  <p className="text-sm italic text-white/90 font-serif leading-relaxed">"{q.quoteText}"</p>
-                                )}
-                                {q.meaning && (
-                                  <p className="text-xs text-[var(--muted)] leading-relaxed">
-                                    <strong className="text-white/70">Meaning:</strong> {q.meaning}
-                                  </p>
-                                )}
-                              </div>
-                            )}
-                            {(q.name || q.avatarUrl) && (
-                              <div className="flex items-center gap-3 pt-4 border-t border-white/5">
-                                {q.avatarUrl ? (
-                                  /* eslint-disable-next-line @next/next/no-img-element */
-                                  <img src={q.avatarUrl} alt="Avatar" className="w-8 h-8 rounded-full object-cover border border-white/10" />
-                                ) : (
-                                  <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[10px] text-[var(--muted)] uppercase">
-                                    {q.name ? q.name.charAt(0) : 'U'}
-                                  </div>
-                                )}
-                                {q.name && <span className="text-xs font-bold text-white tracking-wide">{q.name}</span>}
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        <div className="flex justify-between items-center border-t border-white/5 pt-4">
-                          <div className="text-xs text-[var(--muted)]">
-                            <span className={q.isActive ? 'text-[var(--green)] font-bold tracking-wide uppercase' : 'text-white/50 tracking-wide uppercase'}>
-                              {q.isActive ? 'Active' : 'Hidden'}
-                            </span>
-                          </div>
-                          <div className="flex gap-3">
-                            <button
-                              onClick={() => {
-                                setPreviewId(null);
-                                handleEdit(q);
-                              }}
-                              className="px-4 py-2 text-xs font-bold text-black bg-white hover:bg-gray-200 rounded-lg transition"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => {
-                                setPreviewId(null);
-                                handleDelete(previewId);
-                              }}
-                              className="px-4 py-2 text-xs font-bold text-white bg-[var(--orange)] hover:bg-[#d64a2a] rounded-lg transition"
-                            >
-                              Delete
-                            </button>
-                          </div>
+                      <div className="w-full flex justify-between items-center mt-6 p-4 bg-[#0a0f0c] border border-[var(--border)] rounded-xl">
+                        <div className="text-xs text-[var(--muted)]">
+                          <span className={q.isActive ? 'text-[var(--green)]' : 'text-white/50'}>
+                            {q.isActive ? 'Currently Active' : 'Currently Hidden'}
+                          </span>
+                        </div>
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => {
+                              setPreviewId(null);
+                              handleEdit(q);
+                            }}
+                            className="px-4 py-2 text-xs font-bold text-black bg-white hover:bg-gray-200 rounded-lg transition"
+                          >
+                            Edit Quote
+                          </button>
+                          <button
+                            onClick={() => {
+                              setPreviewId(null);
+                              handleDelete(previewId);
+                            }}
+                            className="px-4 py-2 text-xs font-bold text-white bg-[var(--orange)] hover:bg-[#d64a2a] rounded-lg transition"
+                          >
+                            Delete
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -423,6 +396,19 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
           </>
         )}
       </div>
+      
+      <ConfirmLightbox
+        isOpen={!!confirmDeleteId}
+        title="Delete Quote?"
+        message="Are you sure you want to permanently delete this quote? This action cannot be undone."
+        onConfirm={performDelete}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
+
+      <SuccessLightbox
+        message={status}
+        onClose={() => setStatus("")}
+      />
     </div>
   );
 };
