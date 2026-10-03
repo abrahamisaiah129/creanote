@@ -303,15 +303,13 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
                     ) : (
                       <div className="h-full w-full flex items-center justify-center text-xs text-[var(--muted)]">No Img</div>
                     )}
-                    <div className="absolute top-2 right-2">
-                      <span className={`text-[10px] px-2 py-1 rounded-full font-bold border backdrop-blur-md ${
-                        q.isActive 
-                          ? 'bg-[var(--green)]/30 text-[var(--green)] border-[var(--green)]/50' 
-                          : 'bg-black/50 text-white border-white/20'
-                      }`}>
-                        {q.isActive ? 'Active' : 'Hidden'}
-                      </span>
-                    </div>
+                    {q.isActive && (
+                      <div className="absolute top-2 right-2">
+                        <span className="text-[10px] px-2 py-1 rounded-full font-bold border backdrop-blur-md bg-[var(--green)]/30 text-[var(--green)] border-[var(--green)]/50">
+                          Active
+                        </span>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -360,8 +358,13 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
                         /* eslint-disable-next-line @next/next/no-img-element */
                         <img src={q.imageUrl} alt="Preview" className="w-full rounded-lg object-contain max-h-[70vh] shadow-2xl" />
                       )}
+
+                      <div className="w-full text-center mt-4 mb-2">
+                        {q.quoteText && <p className="text-sm italic text-white/90">"{q.quoteText}"</p>}
+                        {q.name && <p className="text-xs font-bold text-[var(--orange)] mt-2">- {q.name}</p>}
+                      </div>
                       
-                      <div className="w-full flex justify-between items-center mt-6 p-4 bg-[#0a0f0c] border border-[var(--border)] rounded-xl">
+                      <div className="w-full flex justify-between items-center mt-4 p-4 bg-[#0a0f0c] border border-[var(--border)] rounded-xl">
                         <div className="text-xs text-[var(--muted)]">
                           <span className={q.isActive ? 'text-[var(--green)]' : 'text-white/50'}>
                             {q.isActive ? 'Currently Active' : 'Currently Hidden'}

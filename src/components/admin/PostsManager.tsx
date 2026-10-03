@@ -432,7 +432,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
               <tr>
                 <th>Date</th>
                 <th>Headline</th>
-                <th>Author / Subtitle</th>
+                <th className="hidden group-[.sidebar-collapsed]:table-cell">Author / Subtitle</th>
                 <th>Thumbnail</th>
                 <th>Actions</th>
               </tr>
@@ -448,7 +448,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
                     <td className="font-semibold max-w-[300px]">
                       {post.headline}
                     </td>
-                    <td className="text-[var(--muted)]">{post.sub}</td>
+                    <td className="hidden group-[.sidebar-collapsed]:table-cell text-[var(--muted)]">{post.sub}</td>
                     <td>
                       {post.thumbUrl ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
