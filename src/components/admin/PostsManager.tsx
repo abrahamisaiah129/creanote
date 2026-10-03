@@ -1,44 +1,49 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { PostData } from '../PostRow';
-import { placeholderUrl } from '@/lib/defaultData';
-import { ImageUploadField } from '../ImageUploadField';
-import { DotsLoader } from '../DotsLoader';
-import { useActivityLog } from '@/context/ActivityLogContext';
-import { formatDate } from '@/utils/formatDate';
+import React, { useState } from "react";
+import { PostData } from "../PostRow";
+import { placeholderUrl } from "@/lib/defaultData";
+import { ImageUploadField } from "../ImageUploadField";
+import { DotsLoader } from "../DotsLoader";
+import { useActivityLog } from "@/context/ActivityLogContext";
+import { formatDate } from "@/utils/formatDate";
 
 interface PostsManagerProps {
   posts: PostData[];
   onRefresh: () => void;
 }
 
-export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) => {
+export const PostsManager: React.FC<PostsManagerProps> = ({
+  posts,
+  onRefresh,
+}) => {
   const { addLog } = useActivityLog();
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [date, setDate] = useState('');
-  const [headline, setHeadline] = useState('');
-  const [sub, setSub] = useState('');
-  const [thumbUrl, setThumbUrl] = useState(placeholderUrl('Post thumbnail', 640, 360));
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Default to today's date
+  const [headline, setHeadline] = useState("");
+  const [sub, setSub] = useState("");
+  const [thumbUrl, setThumbUrl] = useState(
+    placeholderUrl("Post thumbnail", 640, 360),
+  );
   const [isFeatured, setIsFeatured] = useState(false);
   const [isTopOnTheList, setIsTopOnTheList] = useState(false);
-  const [content, setContent] = useState('');
-  const [authorAvatar, setAuthorAvatar] = useState('');
-  const [status, setStatus] = useState('');
+  const [content, setContent] = useState("");
+  const [authorAvatar, setAuthorAvatar] = useState("");
+  const [status, setStatus] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const resetForm = () => {
     setEditingId(null);
-    setDate('');
-    setHeadline('');
-    setSub('');
-    setThumbUrl(placeholderUrl('Post thumbnail', 640, 360));
+    setDate("");
+    setHeadline("");
+    setSub("");
+    setThumbUrl(placeholderUrl("Post thumbnail", 640, 360));
     setIsFeatured(false);
     setIsTopOnTheList(false);
-    setContent('');
-    setAuthorAvatar('');
-    setStatus('');
+    setContent("");
+    setAuthorAvatar("");
+    setStatus("");
   };
 
   const handleEdit = (post: PostData) => {
@@ -46,30 +51,30 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
     setDate(post.date);
     setHeadline(post.headline);
     setSub(post.sub);
-    setThumbUrl(post.thumbUrl || '');
+    setThumbUrl(post.thumbUrl || "");
     setIsFeatured(!!post.isFeatured);
     setIsTopOnTheList(!!post.isTopOnTheList);
-    setContent(post.content || '');
-    setAuthorAvatar(post.authorAvatar || '');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setContent(post.content || "");
+    setAuthorAvatar(post.authorAvatar || "");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDelete = async (id?: string) => {
     if (!id) return;
-    if (!confirm('Are you sure you want to delete this story?')) return;
+    if (!confirm("Are you sure you want to delete this story?")) return;
 
     setDeletingId(id);
-    setStatus('Deleting...');
+    setStatus("Deleting...");
     try {
-      const res = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/posts/${id}`, { method: "DELETE" });
       if (res.ok) {
-        setStatus('Story deleted successfully.');
-        addLog('Deleted a story', 'delete');
+        setStatus("Story deleted successfully.");
+        addLog("Deleted a story", "delete");
         onRefresh();
       }
     } catch (e) {
       console.error(e);
-      setStatus('Error deleting story.');
+      setStatus("Error deleting story.");
     } finally {
       setDeletingId(null);
     }
@@ -78,7 +83,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    setStatus('Saving...');
+    setStatus("Saving...");
 
     const payload = {
       date,
@@ -94,32 +99,32 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
     try {
       if (editingId) {
         const res = await fetch(`/api/posts/${editingId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
         if (res.ok) {
-          setStatus('Story updated successfully!');
-          addLog(`Updated story: "${headline}"`, 'update');
+          setStatus("Story updated successfully!");
+          addLog(`Updated story: "${headline}"`, "update");
           resetForm();
           onRefresh();
         }
       } else {
-        const res = await fetch('/api/posts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch("/api/posts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
         if (res.ok) {
-          setStatus('Story created successfully!');
-          addLog(`Created new story: "${headline}"`, 'create');
+          setStatus("Story created successfully!");
+          addLog(`Created new story: "${headline}"`, "create");
           resetForm();
           onRefresh();
         }
       }
     } catch (e) {
       console.error(e);
-      setStatus('Error saving story.');
+      setStatus("Error saving story.");
     } finally {
       setIsSaving(false);
     }
@@ -139,8 +144,8 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
           type="button"
           onClick={() => {
             resetForm();
-            const el = document.getElementById('story-form-card');
-            el?.scrollIntoView({ behavior: 'smooth' });
+            const el = document.getElementById("story-form-card");
+            el?.scrollIntoView({ behavior: "smooth" });
           }}
           className="admin-btn-primary text-xs py-2 px-3.5"
           data-testid="add-new-story-btn"
@@ -152,7 +157,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
       <div className="admin-card" id="story-form-card">
         <div className="flex items-center justify-between mb-4">
           <h4 className="text-base font-bold">
-            {editingId ? 'Edit Story' : 'Add New Story'}
+            {editingId ? "Edit Story" : "Add New Story"}
           </h4>
           {editingId && (
             <span className="text-xs bg-[var(--orange)]/20 text-[var(--orange)] px-2.5 py-1 rounded font-bold border border-[var(--orange)]/30">
@@ -233,12 +238,16 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
                 type="checkbox"
                 checked={isFeatured}
                 onChange={(e) => setIsFeatured(e.target.checked)}
-                disabled={!isFeatured && posts.filter(p => p.isFeatured).length >= 1}
+                disabled={
+                  !isFeatured && posts.filter((p) => p.isFeatured).length >= 1
+                }
                 className="w-4 h-4 cursor-pointer accent-[var(--green)]"
               />
               <div className="flex flex-col">
                 <span className="text-[13px] font-bold">Featured Story</span>
-                <span className="text-[11px] text-[var(--muted)]">Shows on Homepage (Max 1)</span>
+                <span className="text-[11px] text-[var(--muted)]">
+                  Shows on Homepage (Max 1)
+                </span>
               </div>
             </label>
             <label className="flex items-center gap-3 cursor-pointer">
@@ -246,24 +255,32 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
                 type="checkbox"
                 checked={isTopOnTheList}
                 onChange={(e) => setIsTopOnTheList(e.target.checked)}
-                disabled={!isTopOnTheList && posts.filter(p => p.isTopOnTheList).length >= 4}
+                disabled={
+                  !isTopOnTheList &&
+                  posts.filter((p) => p.isTopOnTheList).length >= 4
+                }
                 className="w-4 h-4 cursor-pointer accent-[var(--green)]"
               />
               <div className="flex flex-col">
                 <span className="text-[13px] font-bold">Top on the List</span>
-                <span className="text-[11px] text-[var(--muted)]">Shows in Top Items section (Max 4)</span>
+                <span className="text-[11px] text-[var(--muted)]">
+                  Shows in Top Items section (Max 4)
+                </span>
               </div>
             </label>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-[1fr_120px] gap-4 mb-5">
             <div>
-              <div className="text-[11px] text-[var(--muted)] mb-2">Note: Please upload an image to represent this story or feature card.</div>
+              <div className="text-[11px] text-[var(--muted)] mb-2">
+                Note: Please upload an image to represent this story or feature
+                card.
+              </div>
               <ImageUploadField
                 label="Thumbnail / Cover (640x360)"
                 value={thumbUrl}
                 onChange={setThumbUrl}
-                fallbackPlaceholder={placeholderUrl('Post thumbnail', 640, 360)}
+                fallbackPlaceholder={placeholderUrl("Post thumbnail", 640, 360)}
                 testId="post-thumb-input"
                 aspectRatioHint="Recommended: 16:9 widescreen thumbnail"
               />
@@ -271,18 +288,31 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
           </div>
 
           <div className="flex gap-3 items-center">
-            <button type="submit" className="admin-btn-primary" disabled={isSaving} data-testid="post-submit-btn">
-              {isSaving ? <DotsLoader /> : (editingId ? 'Save Changes' : 'Create Story')}
+            <button
+              type="submit"
+              className="admin-btn-primary"
+              disabled={isSaving}
+              data-testid="post-submit-btn"
+            >
+              {isSaving ? (
+                <DotsLoader />
+              ) : editingId ? (
+                "Save Changes"
+              ) : (
+                "Create Story"
+              )}
             </button>
             {editingId && (
-              <button type="button" className="admin-tab-btn" onClick={resetForm}>
+              <button
+                type="button"
+                className="admin-tab-btn"
+                onClick={resetForm}
+              >
                 Cancel
               </button>
             )}
             {status && (
-              <span className="text-[13px] text-[var(--green)]">
-                {status}
-              </span>
+              <span className="text-[13px] text-[var(--green)]">{status}</span>
             )}
           </div>
         </form>
@@ -293,12 +323,12 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
           <h4 className="text-base font-bold flex items-center gap-3">
             Stories Feed ({posts.length})
           </h4>
-          
+
           <div className="flex items-center gap-3">
             {posts.length > 0 && (
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setCurrentTablePage(p => Math.max(1, p - 1))}
+                  onClick={() => setCurrentTablePage((p) => Math.max(1, p - 1))}
                   disabled={currentTablePage === 1}
                   className="p-1 rounded-md bg-white/5 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10"
                 >
@@ -308,7 +338,9 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
                   Page {currentTablePage} of {totalTablePages}
                 </span>
                 <button
-                  onClick={() => setCurrentTablePage(p => Math.min(totalTablePages, p + 1))}
+                  onClick={() =>
+                    setCurrentTablePage((p) => Math.min(totalTablePages, p + 1))
+                  }
                   disabled={currentTablePage === totalTablePages}
                   className="p-1 rounded-md bg-white/5 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10"
                 >
@@ -320,8 +352,8 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
               type="button"
               onClick={() => {
                 resetForm();
-                const el = document.getElementById('story-form-card');
-                el?.scrollIntoView({ behavior: 'smooth' });
+                const el = document.getElementById("story-form-card");
+                el?.scrollIntoView({ behavior: "smooth" });
               }}
               className="admin-btn-primary text-xs py-1.5 px-3"
             >
@@ -345,43 +377,47 @@ export const PostsManager: React.FC<PostsManagerProps> = ({ posts, onRefresh }) 
               {paginatedPosts.map((post, idx) => {
                 const postId = post.id || (post as any)._id;
                 return (
-                <tr key={postId || idx}>
-                  <td className="text-[var(--orange)] font-bold">{formatDate(post.date)}</td>
-                  <td className="font-semibold max-w-[300px]">{post.headline}</td>
-                  <td className="text-[var(--muted)]">{post.sub}</td>
-                  <td>
-                    {post.thumbUrl ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img
-                        src={post.thumbUrl}
-                        alt={post.headline}
-                        className="w-[50px] h-[30px] object-cover rounded"
-                      />
-                    ) : (
-                      '—'
-                    )}
-                  </td>
-                  <td>
-                    <div className="flex gap-2">
-                      <button
-                        className="admin-btn-edit"
-                        onClick={() => handleEdit(post)}
-                        data-testid={`edit-post-btn-${idx}`}
-                        disabled={deletingId === postId}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="admin-btn-danger"
-                        onClick={() => handleDelete(postId)}
-                        data-testid={`delete-post-btn-${idx}`}
-                        disabled={deletingId === postId}
-                      >
-                        {deletingId === postId ? 'Del...' : 'Delete'}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                  <tr key={postId || idx}>
+                    <td className="text-[var(--orange)] font-bold">
+                      {formatDate(post.date)}
+                    </td>
+                    <td className="font-semibold max-w-[300px]">
+                      {post.headline}
+                    </td>
+                    <td className="text-[var(--muted)]">{post.sub}</td>
+                    <td>
+                      {post.thumbUrl ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={post.thumbUrl}
+                          alt={post.headline}
+                          className="w-[50px] h-[30px] object-cover rounded"
+                        />
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td>
+                      <div className="flex gap-2">
+                        <button
+                          className="admin-btn-edit"
+                          onClick={() => handleEdit(post)}
+                          data-testid={`edit-post-btn-${idx}`}
+                          disabled={deletingId === postId}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="admin-btn-danger"
+                          onClick={() => handleDelete(postId)}
+                          data-testid={`delete-post-btn-${idx}`}
+                          disabled={deletingId === postId}
+                        >
+                          {deletingId === postId ? "Del..." : "Delete"}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
                 );
               })}
             </tbody>

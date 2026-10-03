@@ -1,9 +1,11 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Menu, X } from 'lucide-react';
+import React, { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useEffect } from "react";
+import { useParams } from "next/navigation";
+import { Menu, X } from "lucide-react";
 
 interface AdminLayoutProps {
   activeTab: string;
@@ -19,23 +21,36 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   children,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  const searchParams = useParams();
   // User friendly labels avoiding developer jargon
   const tabs = [
-    { id: 'overview', label: 'Dashboard' },
-    { id: 'posts', label: 'Posts' },
-    { id: 'quotes', label: 'Quotes' },
-    { id: 'hero', label: 'Homepage Banners' },
-    { id: 'subscribers', label: 'Mailing List' },
+    { id: "overview", label: "Dashboard" },
+    { id: "posts", label: "Posts" },
+    { id: "quotes", label: "Quotes" },
+    { id: "hero", label: "Homepage Banners" },
+    { id: "subscribers", label: "Mailing List" },
   ];
+  useEffect(() => {
+    const getHashlinkFromUrl = () => {
+      const getHashLink = window.location.hash;
+      const currentHashLink = getHashLink.replace("#", "");
+      return currentHashLink;
+    };
+
+    handleTabClick(getHashlinkFromUrl());
+  }, [searchParams]);
 
   const handleTabClick = (tabId: string) => {
     onTabChange(tabId);
+    window.location.hash = tabId;
     setIsMobileMenuOpen(false);
   };
 
   return (
-    <div className="admin-container min-h-screen bg-[var(--bg)] text-[var(--text)] flex flex-col md:flex-row" data-testid="admin-layout">
+    <div
+      className="admin-container min-h-screen bg-[var(--bg)] text-[var(--text)] flex flex-col md:flex-row"
+      data-testid="admin-layout"
+    >
       {/* Mobile Header (Visible only on small screens) */}
       <header className="md:hidden border-b border-[var(--border)] bg-[#090e0b] px-4 py-3.5 sticky top-0 z-40 backdrop-blur-md flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -70,7 +85,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       {/* Sidebar Navigation */}
       <aside
         className={`w-full md:w-64 bg-[#090e0b] border-r border-[var(--border)] flex flex-col transition-all duration-300 md:sticky md:top-0 md:h-screen md:flex-shrink-0 z-30 ${
-          isMobileMenuOpen ? 'block' : 'hidden md:flex'
+          isMobileMenuOpen ? "block" : "hidden md:flex"
         }`}
       >
         {/* Desktop Logo */}
@@ -99,8 +114,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               type="button"
               className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-semibold font-['Ubuntu'] transition-all ${
                 activeTab === tab.id
-                  ? 'bg-[var(--green)] text-black shadow-[0_2px_10px_rgba(0,208,132,0.2)]'
-                  : 'text-[var(--muted)] hover:bg-[rgba(0,208,132,0.1)] hover:text-white'
+                  ? "bg-[var(--green)] text-black shadow-[0_2px_10px_rgba(0,208,132,0.2)]"
+                  : "text-[var(--muted)] hover:bg-[rgba(0,208,132,0.1)] hover:text-white"
               }`}
               onClick={() => handleTabClick(tab.id)}
               data-testid={`admin-tab-${tab.id}`}
@@ -133,9 +148,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
       {/* Main Content Area */}
       <main className="flex-1 w-full p-4 sm:p-6 md:p-10 overflow-y-auto min-h-[calc(100vh-65px)] md:min-h-screen">
-        <div className="max-w-5xl mx-auto">
-          {children}
-        </div>
+        <div className="max-w-5xl mx-auto">{children}</div>
       </main>
     </div>
   );
