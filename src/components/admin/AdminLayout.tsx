@@ -21,9 +21,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   children,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
- 
+
   const searchParams = useParams();
-  // User friendly labels avoiding developer jargon
   const tabs = [
     { id: "overview", label: "Dashboard" },
     { id: "posts", label: "Posts" },

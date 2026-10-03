@@ -23,6 +23,7 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
   const [status, setStatus] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [previewId, setPreviewId] = useState<string | null>(null);
 
   const resetForm = () => {
     setEditingId(null);
@@ -283,70 +284,37 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-[var(--text)] whitespace-nowrap">
-                <thead className="bg-[#101814] text-xs uppercase text-[var(--muted)] border-b border-[var(--border)]">
-                  <tr>
-                    <th className="px-4 py-3 font-medium">Image</th>
-                    <th className="px-4 py-3 font-medium">Status</th>
-                    <th className="px-4 py-3 font-medium">Date Created</th>
-                    <th className="px-4 py-3 font-medium text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--border)]">
-                  {paginatedQuotes.map((q, idx) => {
-                    const quoteId = q.id || (q as any)._id;
-                    return (
-                    <tr key={quoteId || idx} className="hover:bg-white/[0.02] transition">
-                      <td className="px-4 py-3">
-                        {q.imageUrl ? (
-                           /* eslint-disable-next-line @next/next/no-img-element */
-                           <img src={q.imageUrl} alt="Quote" className="h-12 w-12 object-cover rounded" />
-                        ) : (
-                           <div className="h-12 w-12 bg-white/10 rounded flex items-center justify-center text-xs">No Img</div>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <button
-                          type="button"
-                          onClick={() => handleToggleHero(q)}
-                          className={`text-xs px-2 py-1 rounded-full font-bold border transition ${
-                            q.isActive 
-                              ? 'bg-[var(--green)]/20 text-[var(--green)] border-[var(--green)]/30 hover:bg-[var(--green)]/30' 
-                              : 'bg-white/5 text-[var(--muted)] border-white/10 hover:bg-white/10 hover:text-white'
-                          }`}
-                        >
-                          {q.isActive ? 'Active' : 'Inactive'}
-                        </button>
-                      </td>
-                      <td className="px-4 py-3 text-[var(--muted)]">
-                        {q.createdAt ? new Date(q.createdAt).toLocaleDateString() : 'N/A'}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <button
-                          onClick={() => handleEdit(q)}
-                          className="px-3 py-1.5 text-xs text-white bg-white/10 hover:bg-white/20 rounded mr-2 transition"
-                          disabled={deletingId === quoteId}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(quoteId)}
-                          className="px-3 py-1.5 text-xs text-[var(--orange)] bg-[var(--orange)]/10 hover:bg-[var(--orange)]/20 rounded transition"
-                          disabled={deletingId === quoteId}
-                        >
-                          {deletingId === quoteId ? 'Del...' : 'Del'}
-                        </button>
-                      </td>
-                    </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {paginatedQuotes.map((q, idx) => {
+                const quoteId = q.id || (q as any)._id;
+                return (
+                  <div 
+                    key={quoteId || idx} 
+                    className="relative group cursor-pointer overflow-hidden rounded-lg border border-[var(--border)] bg-black/40 aspect-[3/4]"
+                    onClick={() => setPreviewId(quoteId)}
+                  >
+                    {q.imageUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={q.imageUrl} alt="Quote" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center text-xs text-[var(--muted)]">No Img</div>
+                    )}
+                    <div className="absolute top-2 right-2">
+                      <span className={`text-[10px] px-2 py-1 rounded-full font-bold border backdrop-blur-md ${
+                        q.isActive 
+                          ? 'bg-[var(--green)]/30 text-[var(--green)] border-[var(--green)]/50' 
+                          : 'bg-black/50 text-white border-white/20'
+                      }`}>
+                        {q.isActive ? 'Active' : 'Hidden'}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
             
             {totalTablePages > 1 && (
-              <div className="flex items-center justify-between border-t border-[var(--border)] pt-4 mt-2">
+              <div className="flex items-center justify-between border-t border-[var(--border)] pt-4 mt-6">
                 <span className="text-xs text-[var(--muted)]">
                   Showing {startIdx + 1}-{Math.min(startIdx + ITEMS_PER_PAGE, quotes.length)} of {quotes.length}
                 </span>
@@ -366,6 +334,59 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
                     Next
                   </button>
                 </div>
+              </div>
+            )}
+
+            {/* Admin Quote Lightbox */}
+            {previewId && (
+              <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/95 p-4 backdrop-blur-xl">
+                {(() => {
+                  const q = quotes.find(quote => (quote.id || (quote as any)._id) === previewId);
+                  if (!q) return null;
+                  return (
+                    <div className="relative flex flex-col items-center max-w-lg w-full">
+                      <button
+                        onClick={() => setPreviewId(null)}
+                        className="absolute -top-12 right-0 text-white hover:text-[var(--orange)]"
+                      >
+                        <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                      </button>
+                      
+                      {q.imageUrl && (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img src={q.imageUrl} alt="Preview" className="w-full rounded-lg object-contain max-h-[70vh] shadow-2xl" />
+                      )}
+                      
+                      <div className="w-full flex justify-between items-center mt-6 p-4 bg-[#0a0f0c] border border-[var(--border)] rounded-xl">
+                        <div className="text-xs text-[var(--muted)]">
+                          <span className={q.isActive ? 'text-[var(--green)]' : 'text-white/50'}>
+                            {q.isActive ? 'Currently Active' : 'Currently Hidden'}
+                          </span>
+                        </div>
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => {
+                              setPreviewId(null);
+                              handleEdit(q);
+                            }}
+                            className="px-4 py-2 text-xs font-bold text-black bg-white hover:bg-gray-200 rounded-lg transition"
+                          >
+                            Edit Quote
+                          </button>
+                          <button
+                            onClick={() => {
+                              setPreviewId(null);
+                              handleDelete(previewId);
+                            }}
+                            className="px-4 py-2 text-xs font-bold text-white bg-[var(--orange)] hover:bg-[#d64a2a] rounded-lg transition"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             )}
           </>
