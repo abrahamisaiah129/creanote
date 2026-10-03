@@ -140,23 +140,21 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
                   )}
                   {slide.linkUrl && (
                     <div className="mt-4 sm:mt-6">
-                      <Link href={slide.linkUrl} className="group">
-                        <span className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-4 py-2 font-['Ubuntu'] text-xs font-bold uppercase tracking-wider text-white backdrop-blur-sm transition-colors hover:bg-white hover:text-black group-hover:bg-white group-hover:text-black sm:px-5 sm:py-2.5 sm:text-sm">
-                          Read Story
-                          <svg
-                            className="w-3 h-3 sm:w-4 sm:h-4"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                            <polyline points="12 5 19 12 12 19"></polyline>
-                          </svg>
-                        </span>
-                      </Link>
+                      <span className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-4 py-2 font-['Ubuntu'] text-xs font-bold uppercase tracking-wider text-white backdrop-blur-sm transition-colors group-hover:bg-white group-hover:text-black sm:px-5 sm:py-2.5 sm:text-sm cursor-pointer hover:bg-white hover:text-black">
+                        Read Story
+                        <svg
+                          className="w-3 h-3 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-1"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <line x1="5" y1="12" x2="19" y2="12"></line>
+                          <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                      </span>
                     </div>
                   )}
                 </div>
