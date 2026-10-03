@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 
-import Link from 'next/link';
+import Link from "next/link";
 
 export interface SlideItem {
   id?: string;
@@ -70,7 +70,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
-    
+
     if (isLeftSwipe) {
       // Swiped left, go to next slide
       setCurrent((prev) => (prev + 1) % slides.length);
@@ -79,7 +79,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
       // Swiped right, go to previous slide
       setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
     }
-    
+
     setTouchStart(null);
     setTouchEnd(null);
   };
@@ -115,7 +115,10 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
               />
             </picture>
 
-            {(slide.badgeText || slide.title || slide.headline || slide.meta) && (
+            {(slide.badgeText ||
+              slide.title ||
+              slide.headline ||
+              slide.meta) && (
               // Added pb-16 on mobile to push the text upwards and leave clear room for the dots below it
               <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/90 via-black/55 to-transparent px-4 pb-16 pt-12 sm:px-8 sm:pb-8 sm:pt-16 lg:px-12 lg:pb-10 lg:pt-20">
                 {/* the texts and eyebrow */}
@@ -137,9 +140,17 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
                   )}
                   {slide.linkUrl && (
                     <div className="mt-4 sm:mt-6">
-                      <span className="inline-flex items-center gap-2 border border-white/20 bg-white/10 px-4 py-2 font-['Ubuntu'] text-xs font-bold uppercase tracking-wider text-white backdrop-blur-sm transition-colors hover:bg-white hover:text-black group-hover:bg-white group-hover:text-black sm:px-5 sm:py-2.5 sm:text-sm">
+                      <span className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-4 py-2 font-['Ubuntu'] text-xs font-bold uppercase tracking-wider text-white backdrop-blur-sm transition-colors hover:bg-white hover:text-black group-hover:bg-white group-hover:text-black sm:px-5 sm:py-2.5 sm:text-sm">
                         Read Story
-                        <svg className="w-3 h-3 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg
+                          className="w-3 h-3 sm:w-4 sm:h-4"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
                           <line x1="5" y1="12" x2="19" y2="12"></line>
                           <polyline points="12 5 19 12 12 19"></polyline>
                         </svg>
@@ -160,7 +171,10 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
             data-testid={`hero-slide-${idx}`}
           >
             {slide.linkUrl ? (
-              <Link href={slide.linkUrl} className="group block w-full h-full text-inherit no-underline">
+              <Link
+                href={slide.linkUrl}
+                className="group block w-full h-full text-inherit no-underline"
+              >
                 {slideContent}
               </Link>
             ) : (

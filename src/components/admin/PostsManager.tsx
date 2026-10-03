@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PostData } from "../PostRow";
 import { placeholderUrl } from "@/lib/defaultData";
 import { ImageUploadField } from "../ImageUploadField";
@@ -44,6 +44,11 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
     setContent("");
     setAuthorAvatar("");
     setStatus("");
+  };
+  const onRefresh: () => void = () => {
+    // window.location.reload();
+    // fake refresh will be an update to the useEffect
+    triggerRefresh();
   };
 
   const handleEdit = (post: PostData) => {
