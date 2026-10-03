@@ -106,8 +106,37 @@ export const TopListSection: React.FC<TopListSectionProps> = ({
       className="mx-auto max-w-[1280px] px-6 py-10 md:px-10 md:py-14"
       data-testid="top-list-section"
     >
-      <div className="mb-6 font-['Ubuntu'] text-xl font-bold text-[var(--text)] md:text-2xl">
-        {title}
+      <div className="mb-6 flex items-center justify-between">
+        <div className="font-['Ubuntu'] text-xl font-bold text-[var(--text)] md:text-2xl">
+          {title}
+        </div>
+        {/* Desktop only navigation buttons */}
+        <div className="hidden md:flex gap-3">
+          <button
+            onClick={() => {
+              const el = scrollContainerRef.current;
+              if (el) el.scrollBy({ left: -400, behavior: 'smooth' });
+            }}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:bg-white hover:text-black"
+            aria-label="Scroll left"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+          </button>
+          <button
+            onClick={() => {
+              const el = scrollContainerRef.current;
+              if (el) el.scrollBy({ left: 400, behavior: 'smooth' });
+            }}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:bg-white hover:text-black"
+            aria-label="Scroll right"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Horizontally scrollable container with bigger card images and touch/drag interactive */}
