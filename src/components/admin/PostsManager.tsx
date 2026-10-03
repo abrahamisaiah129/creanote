@@ -60,6 +60,30 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleToggleFeature = async (post: PostData) => {
+    const postId = post.id || (post as any)._id;
+    if (!postId) return;
+    setStatus("Updating feature status...");
+    try {
+      const res = await fetch(`/api/posts/${postId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...post, isFeatured: !post.isFeatured }),
+      });
+      if (res.ok) {
+        setStatus(`Story ${!post.isFeatured ? "featured" : "unfeatured"}!`);
+        addLog(
+          `${!post.isFeatured ? "Featured" : "Unfeatured"} story: "${post.headline}"`,
+          "update"
+        );
+        onRefresh();
+      }
+    } catch (e) {
+      console.error(e);
+      setStatus("Error updating story feature status.");
+    }
+  };
+
   const handleDelete = async (id?: string) => {
     if (!id) return;
     if (!confirm("Are you sure you want to delete this story?")) return;
@@ -400,6 +424,21 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
                     </td>
                     <td>
                       <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleFeature(post)}
+                          disabled={!post.isFeatured && posts.filter(p => p.isFeatured).length >= 1}
+                          className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md font-bold transition ${
+                            post.isFeatured
+                              ? 'bg-[var(--green)]/20 text-[var(--green)] hover:bg-[var(--green)]/30'
+                              : 'bg-white/5 text-[var(--muted)] hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed'
+                          }`}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill={post.isFeatured ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                          </svg>
+                          {post.isFeatured ? 'Featured' : 'Feature'}
+                        </button>
                         <button
                           className="admin-btn-edit"
                           onClick={() => handleEdit(post)}
