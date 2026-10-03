@@ -45,11 +45,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
     setAuthorAvatar("");
     setStatus("");
   };
-  const onRefresh: () => void = () => {
-    // window.location.reload();
-    // fake refresh will be an update to the useEffect
-    triggerRefresh();
-  };
+
 
   const handleEdit = (post: PostData) => {
     setEditingId(post.id || (post as any)._id || null);
