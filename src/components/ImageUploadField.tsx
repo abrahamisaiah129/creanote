@@ -73,27 +73,13 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
     }
   };
 
-  const isPlaceholder = value.includes('placehold.co') || !value;
-  const isCloudinary = value.includes('cloudinary.com') || value.includes('res.cloudinary');
-
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
       <div className="flex items-center justify-between">
         <label className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">
           {label}
         </label>
-        <div className="flex items-center gap-2">
-          {isCloudinary && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--green)]/15 px-2 py-0.5 text-[10px] font-bold text-[var(--green)]">
-              <Check size={10} /> Cloudinary
-            </span>
-          )}
-          {isPlaceholder && (
-            <span className="inline-flex items-center rounded-full bg-white/5 px-2 py-0.5 text-[10px] font-medium text-neutral-400">
-              Placeholder
-            </span>
-          )}
-        </div>
+
       </div>
 
       <input

@@ -59,7 +59,7 @@ export const Footer: React.FC<FooterProps> = ({ onSearchClick }) => {
           </div>
 
           {/* Explore column */}
-          <div className="flex flex-col items-center gap-4 md:items-start">
+          <div className="flex flex-col pt-[25px] items-center gap-4 md:items-start">
             <span className="text-xs font-bold uppercase tracking-[1.5px] text-[var(--orange)]">
               Explore
             </span>
@@ -92,7 +92,7 @@ export const Footer: React.FC<FooterProps> = ({ onSearchClick }) => {
           </div>
 
           {/* Socials & Search column */}
-          <div className="flex flex-col items-center gap-6 md:items-start">
+          <div className="flex flex-col pt-[25px] items-center gap-6 md:items-start">
             <div className="flex flex-col items-center gap-4 md:items-start">
               <span className="text-xs font-bold uppercase tracking-[1.5px] text-[var(--orange)]">
                 Socials
