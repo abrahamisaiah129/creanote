@@ -1,6 +1,5 @@
 import React from "react";
 import type { Metadata } from "next";
-// @ts-expect-error Global CSS is handled by Next.js at build time.
 import "./globals.css";
 import { BackToTop } from "@/components/BackToTop";
 
