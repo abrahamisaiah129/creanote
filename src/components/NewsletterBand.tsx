@@ -115,13 +115,14 @@ export const NewsletterBand: React.FC<NewsletterBandProps> = ({
 
               {/* Form */}
               <form
-                className="mt-4 md:mt-5 flex items-stretch w-full max-w-[340px] md:max-w-[370px] h-9 md:h-10 rounded-[8px] overflow-hidden"
+                className="mt-4 flex h-9 w-full max-w-[340px] items-stretch overflow-hidden rounded-[6px] border border-[#0a8e64] bg-[#04b978] md:mt-5 md:h-10 md:max-w-[370px]"
                 onSubmit={handleSubmit}
               >
                 <input
-                  className="h-full min-w-0 flex-1 bg-black/20 focus:bg-white px-3 md:px-3.5 text-xs md:text-[13px] font-['Ubuntu'] font-normal text-white focus:text-[#131917] placeholder:italic placeholder:text-white/60 focus:placeholder:text-[#525252] outline-none border-none transition-colors"
+                  className="h-full min-w-0 flex-1 border-0 bg-[#08a96f] px-3 font-['Ubuntu'] text-xs font-normal text-white outline-none transition-colors placeholder:text-white/40 focus:bg-[#0aa875] focus:ring-0 md:px-3.5 md:text-[13px]"
                   type="email"
                   placeholder="officialcreanote@gmail.com"
+                  aria-label="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={status === "loading"}
@@ -130,7 +131,7 @@ export const NewsletterBand: React.FC<NewsletterBandProps> = ({
                 />
                 <button
                   type="submit"
-                  className="h-full px-5 md:px-6 bg-[#131917] text-xs md:text-[13px] font-['Ubuntu'] font-bold text-[var(--green)] transition hover:bg-[#1c2420] active:scale-[0.98] flex items-center justify-center shrink-0 cursor-pointer"
+                  className="h-full min-w-[54px] shrink-0 cursor-pointer bg-[#131917] px-4 font-['Ubuntu'] text-[11px] font-bold text-[var(--green)] transition hover:bg-[#1c2420] active:scale-[0.98] md:min-w-[58px] md:px-5 md:text-xs"
                   disabled={status === "loading"}
                   data-testid="newsletter-submit"
                 >

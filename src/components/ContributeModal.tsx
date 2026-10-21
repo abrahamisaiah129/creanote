@@ -1,12 +1,14 @@
 'use client';
 
 import React from 'react';
-import { X } from 'lucide-react';
+import { ArrowUpRight, X } from 'lucide-react';
 import Link from 'next/link';
 
 interface ContributeModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSubmitSuccess?: () => void | Promise<void>;
+  defaultTab?: string;
 }
 
 export const ContributeModal: React.FC<ContributeModalProps> = ({
@@ -15,72 +17,80 @@ export const ContributeModal: React.FC<ContributeModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
+  const contributionOptions = [
+    {
+      title: 'Drop a quote',
+      description: 'Share a thought, reflection or piece of advice',
+      href: 'https://forms.gle/qZNp9KhdbiQjCWNb9',
+    },
+    {
+      title: 'Project Feature',
+      description: 'Share the story behind a creative project',
+      href: 'https://forms.gle/qnxJqCs9cmHmFfgH7',
+    },
+    {
+      title: 'Convo with a Creative',
+      description: 'Share your creative journey, experiences and lessons.',
+      href: 'https://forms.gle/g5wLTry5P6AqWz9Z7',
+    },
+    {
+      title: 'Creanote Feature',
+      description: 'Share your creative journey, experiences and lessons.',
+      href: 'https://forms.gle/j4pArmLFyH2KDMqHA',
+    },
+    {
+      title: 'Join the team',
+      description: 'Share your creative journey, experiences and lessons.',
+      href: 'https://forms.gle/JZ1Xgp3PiAfzyijg8',
+    },
+  ];
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
       <div 
-        className="relative w-full max-w-md overflow-hidden rounded-2xl border border-[var(--border)] bg-[#050a07] p-6 shadow-2xl animate-in fade-in zoom-in duration-200"
+        className="relative w-full max-w-sm overflow-hidden rounded-lg border border-[var(--border)] bg-[#07100c] p-3 shadow-2xl animate-in fade-in zoom-in duration-200 sm:p-4"
         data-testid="contribute-modal"
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-white/5 text-[var(--muted)] transition hover:bg-white/10 hover:text-white"
+          className="absolute right-2 top-2 z-10 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-white/10 text-[var(--muted)] transition hover:bg-white/15 hover:text-white"
+          aria-label="Close contribute options"
         >
-          <X size={16} />
+          <X size={14} />
         </button>
 
-        <div className="mb-6 pr-8">
-          <h2 className="font-['Ubuntu'] text-xl font-extrabold text-white">
+        <div className="mb-3 pr-8">
+          <h2 className="font-['Ubuntu'] text-sm font-extrabold text-[var(--green)] sm:text-base">
             Contribute to Creanote
           </h2>
-          <p className="mt-2 text-sm text-[var(--muted)] leading-relaxed">
-            Select what you would like to share. You will be redirected to a secure Google Form to submit your details.
+          <p className="mt-1 text-[9px] leading-tight text-[var(--muted)] sm:text-[10px]">
+            There are a few ways you can be part of the Creanote community.
           </p>
         </div>
 
-        <div className="flex flex-col gap-3">
-          <Link 
-            href="https://forms.gle/qnxJqCs9cmHmFfgH7" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            onClick={onClose}
-            className="flex items-center justify-between rounded-xl border border-white/10 bg-[#121c16] p-4 transition-colors hover:border-[var(--green)] hover:bg-[var(--green)]/10 group"
-          >
-            <span className="font-['Ubuntu'] text-sm font-bold text-white">Project Feature</span>
-            <span className="text-[var(--green)] opacity-0 transition-opacity group-hover:opacity-100">→</span>
-          </Link>
-          
-          <Link 
-            href="https://forms.gle/qZNp9KhdbiQjCWNb9" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            onClick={onClose}
-            className="flex items-center justify-between rounded-xl border border-white/10 bg-[#121c16] p-4 transition-colors hover:border-[var(--green)] hover:bg-[var(--green)]/10 group"
-          >
-            <span className="font-['Ubuntu'] text-sm font-bold text-white">Share a quote</span>
-            <span className="text-[var(--green)] opacity-0 transition-opacity group-hover:opacity-100">→</span>
-          </Link>
-          
-          <Link 
-            href="https://forms.gle/g5wLTry5P6AqWz9Z7" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            onClick={onClose}
-            className="flex items-center justify-between rounded-xl border border-white/10 bg-[#121c16] p-4 transition-colors hover:border-[var(--green)] hover:bg-[var(--green)]/10 group"
-          >
-            <span className="font-['Ubuntu'] text-sm font-bold text-white">Convo with a creative</span>
-            <span className="text-[var(--green)] opacity-0 transition-opacity group-hover:opacity-100">→</span>
-          </Link>
-          
-          <Link 
-            href="https://forms.gle/j4pArmLFyH2KDMqHA" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            onClick={onClose}
-            className="flex items-center justify-between rounded-xl border border-white/10 bg-[#121c16] p-4 transition-colors hover:border-[var(--green)] hover:bg-[var(--green)]/10 group"
-          >
-            <span className="font-['Ubuntu'] text-sm font-bold text-white">Creanote feature</span>
-            <span className="text-[var(--green)] opacity-0 transition-opacity group-hover:opacity-100">→</span>
-          </Link>
+        <div className="flex flex-col gap-2">
+          {contributionOptions.map((option) => (
+            <Link
+              key={option.title}
+              href={option.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={onClose}
+              className="group flex min-h-11 items-center justify-between rounded-md border border-white/10 bg-[#121c16] px-3 py-2 transition-colors hover:border-[var(--green)] hover:bg-[var(--green)]/10"
+            >
+              <span className="min-w-0 pr-3">
+                <span className="block truncate font-['Ubuntu'] text-[11px] font-bold text-white sm:text-xs">
+                  {option.title}
+                </span>
+                <span className="mt-0.5 block truncate text-[8px] leading-tight text-[var(--muted)] sm:text-[9px]">
+                  {option.description}
+                </span>
+              </span>
+              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[var(--green)] text-[var(--green)] transition-colors group-hover:bg-[var(--green)] group-hover:text-[#07100c]">
+                <ArrowUpRight size={10} strokeWidth={2.5} />
+              </span>
+            </Link>
+          ))}
         </div>
       </div>
     </div>

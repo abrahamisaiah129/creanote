@@ -131,7 +131,7 @@ export const Footer: React.FC<FooterProps> = ({ onSearchClick }) => {
                   </svg>
                 </a>
                 <a
-                  href="https://www.facebook.com/share/1C4ig9uFYz/?mibextid=wwXIfr"
+                  href="https://www.facebook.com/profile.php?id=61591191400860"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex h-[46px] w-[46px] items-center justify-center rounded-full bg-[var(--green)] text-black transition hover:-translate-y-0.5 hover:opacity-80"
