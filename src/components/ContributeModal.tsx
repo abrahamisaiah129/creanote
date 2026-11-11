@@ -19,28 +19,28 @@ export const ContributeModal: React.FC<ContributeModalProps> = ({
 
   const contributionOptions = [
     {
-      title: 'Drop a quote',
-      description: 'Share a thought, reflection or piece of advice',
-      href: 'https://forms.gle/qZNp9KhdbiQjCWNb9',
-    },
-    {
-      title: 'Project Feature',
-      description: 'Share the story behind a creative project',
-      href: 'https://forms.gle/qnxJqCs9cmHmFfgH7',
-    },
-    {
-      title: 'Convo with a Creative',
-      description: 'Share your creative journey, experiences and lessons.',
-      href: 'https://forms.gle/g5wLTry5P6AqWz9Z7',
-    },
-    {
-      title: 'Creanote Feature',
-      description: 'Share your creative journey, experiences and lessons.',
+      title: 'Get Featured',
+      description: 'Share your story with us for a Creanote feature.',
       href: 'https://forms.gle/j4pArmLFyH2KDMqHA',
     },
     {
+      title: 'Convo with a Creative',
+      description: 'Talk honestly about the parts of creativity people rarely see.',
+      href: 'https://forms.gle/g5wLTry5P6AqWz9Z7',
+    },
+    {
+      title: 'Project Feature',
+      description: 'Share the story behind a creative project.',
+      href: 'https://forms.gle/qnxJqCs9cmHmFfgH7',
+    },
+    {
+      title: 'Quote',
+      description: 'Share a thought, lesson, experience, or idea from your creative journey.',
+      href: 'https://forms.gle/qZNp9KhdbiQjCWNb9',
+    },
+    {
       title: 'Join the team',
-      description: 'Share your creative journey, experiences and lessons.',
+      description: 'Help us discover stories and build Creanote with other creatives.',
       href: 'https://forms.gle/JZ1Xgp3PiAfzyijg8',
     },
   ];

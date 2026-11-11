@@ -64,14 +64,14 @@ describe('Stories Page & Story Reader Detail Tests', () => {
       render(<StoriesPage />);
     });
 
-    let devNotePill: HTMLElement;
+    let featuredPill: HTMLElement;
     await waitFor(() => {
-      devNotePill = screen.getByRole('button', { name: 'DEV NOTE' });
-      expect(devNotePill).toBeInTheDocument();
+      featuredPill = screen.getByRole('button', { name: 'FEATURED' });
+      expect(featuredPill).toBeInTheDocument();
     });
-    fireEvent.click(devNotePill!);
+    fireEvent.click(featuredPill!);
 
-    // After filtering by DEV NOTE, post-1 is present
+    // After filtering by FEATURED, the story remains visible.
     await waitFor(() => {
       expect(
         screen.getByText('A creator shared a note that keeps her going.')

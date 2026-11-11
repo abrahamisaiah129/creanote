@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import { Post } from '@/models/Post';
-import { defaultPosts } from '@/lib/defaultData';
+import { defaultPosts, normalizeStoryCategory, STORY_CATEGORIES } from '@/lib/defaultData';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +25,12 @@ export async function GET(req: Request) {
       if (isFeatured) query.isFeatured = true;
       if (isTopOnTheList) query.isTopOnTheList = true;
       if (category && category.toUpperCase() !== 'ALL') {
-        query.category = { $regex: new RegExp(`^${category}$`, 'i') };
+        const normalizedCategory = normalizeStoryCategory(category);
+        const categoryValues =
+          normalizedCategory === 'FEATURED' ? ['FEATURED', 'FEATURES'] : [normalizedCategory];
+        query.category = {
+          $in: categoryValues.map((value) => new RegExp(`^${value}$`, 'i')),
+        };
       }
       if (author && author.toUpperCase() !== 'ALL') {
         query.$or = [
@@ -65,7 +70,10 @@ export async function GET(req: Request) {
         mongoQuery = mongoQuery.skip(skip).limit(limit);
       }
       
-      const posts = await mongoQuery.lean();
+      const posts = (await mongoQuery.lean()).map((post) => ({
+        ...post,
+        category: normalizeStoryCategory(post.category),
+      }));
       
       if (paginated) {
         // Simple aggregation for categories and authors for filter dropdowns
@@ -74,8 +82,7 @@ export async function GET(req: Request) {
         const authSet = new Set<string>();
         
         allPosts.forEach(p => {
-          const cat = (p.category || (p.sub?.includes('Developer') ? 'DEV NOTE' : 'CREATOR NOTE')).toUpperCase().trim();
-          if (cat && cat !== 'ALL') catSet.add(cat);
+          catSet.add(normalizeStoryCategory(p.category));
           
           const auth = (p.author || p.sub?.split('|')[0]?.trim() || '').trim();
           if (auth && auth.toUpperCase() !== 'ALL') authSet.add(auth);
@@ -87,7 +94,7 @@ export async function GET(req: Request) {
           page,
           limit: limit > 0 ? limit : total,
           totalPages: limit > 0 ? Math.ceil(total / limit) : 1,
-          categories: Array.from(catSet).sort(),
+          categories: STORY_CATEGORIES.filter((storyCategory) => catSet.has(storyCategory)),
           authors: Array.from(authSet).sort((a, b) => a.localeCompare(b))
         });
       }
@@ -96,7 +103,10 @@ export async function GET(req: Request) {
     }
 
     // Offline / unit-test fallback when MONGODB_URI is not set
-    let filtered = [...defaultPosts];
+    let filtered = defaultPosts.map((post) => ({
+      ...post,
+      category: normalizeStoryCategory(post.category),
+    }));
     if (search) {
       const s = search.toLowerCase();
       filtered = filtered.filter(
@@ -110,7 +120,8 @@ export async function GET(req: Request) {
         total: filtered.length,
         page: 1,
         limit: filtered.length,
-        totalPages: 1
+        totalPages: 1,
+        categories: [...STORY_CATEGORIES],
       });
     }
     return NextResponse.json(filtered);
@@ -123,7 +134,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { date, headline, sub, thumbUrl, isFeatureBadge, featureText, authorAvatar, gallery } = body;
+    const { date, headline, sub, thumbUrl, isFeatureBadge, featureText, authorAvatar, gallery, category } = body;
 
     if (!headline || !date || !sub) {
       return NextResponse.json(
@@ -146,6 +157,7 @@ export async function POST(req: Request) {
       sub,
       thumbUrl: thumbUrl || '',
       authorAvatar: authorAvatar || '',
+      category: normalizeStoryCategory(category),
       isFeatureBadge: !!isFeatureBadge,
       featureText: featureText || '',
       gallery: Array.isArray(gallery) ? gallery : [],

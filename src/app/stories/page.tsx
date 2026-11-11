@@ -9,7 +9,7 @@ import { ContributeModal } from '@/components/ContributeModal';
 import { SearchModal } from '@/components/SearchModal';
 import { Pagination } from '@/components/Pagination';
 import { PostData } from '@/components/PostRow';
-import { placeholderUrl } from '@/lib/defaultData';
+import { normalizeStoryCategory, placeholderUrl, STORY_CATEGORIES } from '@/lib/defaultData';
 import { Clock, ArrowUpRight, BookOpen, PlusCircle, Search, X, SlidersHorizontal } from 'lucide-react';
 import { formatDate } from '@/utils/formatDate';
 
@@ -18,7 +18,7 @@ export default function StoriesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalPosts, setTotalPosts] = useState(0);
-  const [dynamicCategories, setDynamicCategories] = useState<string[]>(['ALL', 'FEATURES', 'CONVO WITH A CREATIVE', 'PROJECT FEATURES']);
+  const dynamicCategories = ['ALL', ...STORY_CATEGORIES];
   const [dynamicAuthors, setDynamicAuthors] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -359,7 +359,7 @@ export default function StoriesPage() {
                 post.coverImage ||
                 post.thumbUrl ||
                 placeholderUrl(post.headline, 1200, 800);
-              const category = post.category || 'CREATOR NOTE';
+              const category = normalizeStoryCategory(post.category);
               const readTime = post.readTime || '4 min read';
               const author = post.author || post.sub.split('|')[0]?.trim() || 'Creanote Creator';
 

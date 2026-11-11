@@ -1,6 +1,23 @@
 export const placeholderUrl = (text: string, width = 800, height = 500) =>
   `https://placehold.co/${width}x${height}/0c100d/f0f5f0?text=${encodeURIComponent(text).replace(/%20/g, '+')}`;
 
+export const STORY_CATEGORIES = [
+  'FEATURED',
+  'CONVO WITH A CREATIVE',
+  'PROJECT FEATURES',
+] as const;
+
+export type StoryCategory = (typeof STORY_CATEGORIES)[number];
+
+export const normalizeStoryCategory = (category?: string): StoryCategory => {
+  const normalized = category?.trim().toUpperCase();
+
+  if (normalized === 'CONVO WITH A CREATIVE') return 'CONVO WITH A CREATIVE';
+  if (normalized === 'PROJECT FEATURES') return 'PROJECT FEATURES';
+
+  return 'FEATURED';
+};
+
 export const defaultHeroSlides = [
   {
     id: 'hero-0',
@@ -146,7 +163,7 @@ export const defaultPosts = [
     date: '2026-01-14',
     headline: 'If you create, this space is for you. Get to know Creanote in 5 slides',
     sub: 'Have any other questions? Let us know in the comments or direct message',
-    category: 'FEATURES',
+    category: 'FEATURED',
     author: 'Creanote Editorial',
     authorRole: 'Community & Culture',
     readTime: '3 min read',
@@ -166,7 +183,7 @@ export const defaultPosts = [
     date: '2026-01-23',
     headline: 'Creanote makes link sharing live on all platforms',
     sub: 'Creanote Update',
-    category: 'FEATURES',
+    category: 'FEATURED',
     author: 'Product Team',
     authorRole: 'HQ',
     readTime: '2 min read',

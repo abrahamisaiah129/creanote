@@ -37,7 +37,7 @@ const PostSchema: Schema = new Schema({
   author: { type: String, default: 'Creanote Creator' },
   authorRole: { type: String, default: 'Creator' },
   authorAvatar: { type: String, default: '' },
-  category: { type: String, default: 'DEV NOTE' },
+  category: { type: String, default: 'FEATURED' },
   tags: { type: [String], default: [] },
   readTime: { type: String, default: '4 min read' },
   isFeatureBadge: { type: Boolean, default: false },

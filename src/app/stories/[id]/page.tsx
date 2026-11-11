@@ -9,6 +9,7 @@ import { Footer } from '@/components/Footer';
 import { SearchModal } from '@/components/SearchModal';
 import { ContributeModal } from '@/components/ContributeModal';
 import { PostData } from '@/components/PostRow';
+import { normalizeStoryCategory } from '@/lib/defaultData';
 import { placeholderUrl } from '@/lib/defaultData';
 import { ArrowLeft, Clock, Calendar, Share2, ArrowUpRight, X } from 'lucide-react';
 import { DotsLoader } from '@/components/DotsLoader';
@@ -118,7 +119,7 @@ export default function StoryDetailPage() {
           </Link>
 
           <span className="rounded bg-[var(--green)]/15 px-3 py-1 font-['Ubuntu'] text-[11px] font-black uppercase tracking-wider text-[var(--green)]">
-            {post.category || 'CREATOR NOTE'}
+            {normalizeStoryCategory(post.category)}
           </span>
         </div>
 

@@ -20,7 +20,7 @@ const PostSchema = new mongoose.Schema({
   coverImage: { type: String },
   author: { type: String, default: 'Creanote Creator' },
   authorRole: { type: String, default: 'Creator' },
-  category: { type: String, default: 'DEV NOTE' },
+  category: { type: String, default: 'FEATURED' },
   tags: { type: [String], default: [] },
   readTime: { type: String, default: '4 min read' },
   isFeatureBadge: { type: Boolean, default: false },
@@ -80,6 +80,26 @@ const HeroSlide = mongoose.models.HeroSlide || mongoose.model('HeroSlide', HeroS
 
 const ph = (text, w = 800, h = 500) =>
   `https://placehold.co/${w}x${h}/0c100d/f0f5f0?text=${encodeURIComponent(text).replace(/%20/g, '+')}`;
+
+const normalizeStoryCategory = (category = '') => {
+  const normalized = category.toUpperCase().trim();
+
+  if (
+    ['CREATIVE ESSAY', 'MINDSET', 'MASTERY', 'MINIMALISM', 'PERSEVERANCE'].includes(normalized)
+  ) {
+    return 'CONVO WITH A CREATIVE';
+  }
+
+  if (
+    ['CRAFT', 'DESIGN', 'DESIGN STORY', 'INNOVATION', 'STARTUP', 'STARTUP JOURNEY'].includes(
+      normalized
+    )
+  ) {
+    return 'PROJECT FEATURES';
+  }
+
+  return 'FEATURED';
+};
 
 // 50 REALISTIC POSTS
 export const SEED_POSTS = [
@@ -753,7 +773,7 @@ export async function runSeed() {
   for (const post of SEED_POSTS) {
     await Post.updateOne(
       { slug: post.slug },
-      { $set: post },
+      { $set: { ...post, category: normalizeStoryCategory(post.category) } },
       { upsert: true }
     );
   }
