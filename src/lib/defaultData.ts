@@ -9,6 +9,9 @@ export const STORY_CATEGORIES = [
 
 export type StoryCategory = (typeof STORY_CATEGORIES)[number];
 
+export const isStoryCategory = (category?: string): category is StoryCategory =>
+  STORY_CATEGORIES.includes(category as StoryCategory);
+
 export const normalizeStoryCategory = (category?: string): StoryCategory => {
   const normalized = category?.trim().toUpperCase();
 

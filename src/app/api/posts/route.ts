@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import { Post } from '@/models/Post';
-import { defaultPosts, normalizeStoryCategory, STORY_CATEGORIES } from '@/lib/defaultData';
+import {
+  defaultPosts,
+  isStoryCategory,
+  normalizeStoryCategory,
+  STORY_CATEGORIES,
+} from '@/lib/defaultData';
 
 export const dynamic = 'force-dynamic';
 
@@ -136,9 +141,9 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { date, headline, sub, thumbUrl, isFeatureBadge, featureText, authorAvatar, gallery, category } = body;
 
-    if (!headline || !date || !sub) {
+    if (!headline || !date || !sub || !isStoryCategory(category?.trim().toUpperCase())) {
       return NextResponse.json(
-        { error: 'Date, headline, and subtitle are required' },
+        { error: 'Date, headline, subtitle, and a valid story category are required' },
         { status: 400 }
       );
     }
@@ -157,7 +162,7 @@ export async function POST(req: Request) {
       sub,
       thumbUrl: thumbUrl || '',
       authorAvatar: authorAvatar || '',
-      category: normalizeStoryCategory(category),
+      category: category.trim().toUpperCase(),
       isFeatureBadge: !!isFeatureBadge,
       featureText: featureText || '',
       gallery: Array.isArray(gallery) ? gallery : [],

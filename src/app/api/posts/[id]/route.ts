@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import { Post } from '@/models/Post';
+import { isStoryCategory } from '@/lib/defaultData';
 
 import mongoose from 'mongoose';
 
@@ -42,12 +43,25 @@ export async function PUT(
     const { id } = params;
     const body = await req.json();
 
+    if (
+      body.category !== undefined &&
+      !isStoryCategory(String(body.category).trim().toUpperCase())
+    ) {
+      return NextResponse.json({ error: 'Invalid story category' }, { status: 400 });
+    }
+
     const conn = await connectToDatabase();
     if (!conn) {
       return NextResponse.json({ message: 'Updated (offline mode)', post: body });
     }
 
-    const updated = await Post.findByIdAndUpdate(id, body, { new: true }).lean();
+    const updated = await Post.findByIdAndUpdate(
+      id,
+      body.category
+        ? { ...body, category: String(body.category).trim().toUpperCase() }
+        : body,
+      { new: true }
+    ).lean();
     if (!updated) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }

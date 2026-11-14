@@ -92,6 +92,7 @@ describe('Milestone 3: CRUD API Endpoints', () => {
           headline: 'A note on perseverance in coding',
           sub: 'John Doe | Developer',
           thumbUrl: '/images/post-1.jpg',
+          category: 'CONVO WITH A CREATIVE',
         }),
       });
       const response = await postPost(req);

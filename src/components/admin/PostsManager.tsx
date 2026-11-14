@@ -2,7 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import { PostData } from "../PostRow";
-import { placeholderUrl } from "@/lib/defaultData";
+import {
+  normalizeStoryCategory,
+  placeholderUrl,
+  STORY_CATEGORIES,
+  type StoryCategory,
+} from "@/lib/defaultData";
 import { ImageUploadField } from "../ImageUploadField";
 import { DotsLoader } from "../DotsLoader";
 import { useActivityLog } from "@/context/ActivityLogContext";
@@ -27,7 +32,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
   const [thumbUrl, setThumbUrl] = useState(
     placeholderUrl("Post thumbnail", 640, 360),
   );
-  const [isFeatured, setIsFeatured] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<StoryCategory | "">("");
   const [isTopOnTheList, setIsTopOnTheList] = useState(false);
   const [content, setContent] = useState("");
   const [authorAvatar, setAuthorAvatar] = useState("");
@@ -43,7 +48,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
     setHeadline("");
     setSub("");
     setThumbUrl(placeholderUrl("Post thumbnail", 640, 360));
-    setIsFeatured(false);
+    setSelectedCategory("");
     setIsTopOnTheList(false);
     setContent("");
     setAuthorAvatar("");
@@ -61,7 +66,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
     setHeadline(post.headline);
     setSub(post.sub);
     setThumbUrl(post.thumbUrl || "");
-    setIsFeatured(!!post.isFeatured);
+    setSelectedCategory(normalizeStoryCategory(post.category));
     setIsTopOnTheList(!!post.isTopOnTheList);
     setContent(post.content || "");
     setAuthorAvatar(post.authorAvatar || "");
@@ -100,7 +105,10 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
   };
 
   const handleToggleTopOnTheList = async (post: PostData) => {
-    if (!post.isTopOnTheList && posts.filter((p) => p.isTopOnTheList).length >= 4) {
+    if (
+      !post.isTopOnTheList &&
+      posts.filter((p) => p.isTopOnTheList).length >= 4
+    ) {
       setIsError(true);
       setStatus("Max reached: Only 4 stories can be Top on the List.");
       return;
@@ -116,10 +124,12 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
         body: JSON.stringify({ ...post, isTopOnTheList: !post.isTopOnTheList }),
       });
       if (res.ok) {
-        setStatus(`Story ${!post.isTopOnTheList ? "added to Top List" : "removed from Top List"}!`);
+        setStatus(
+          `Story ${!post.isTopOnTheList ? "added to Top List" : "removed from Top List"}!`,
+        );
         addLog(
           `${!post.isTopOnTheList ? "Added to" : "Removed from"} Top List: "${post.headline}"`,
-          "update"
+          "update",
         );
         onRefresh();
       }
@@ -158,6 +168,11 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedCategory) {
+      setIsError(true);
+      setStatus("Please choose a story category.");
+      return;
+    }
     setIsSaving(true);
     setStatus("Saving...");
 
@@ -168,7 +183,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
       content,
       thumbUrl,
       authorAvatar,
-      isFeatured,
+      category: selectedCategory,
       isTopOnTheList,
     };
 
@@ -208,7 +223,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
 
   const ITEMS_PER_PAGE = 5;
   const [currentTablePage, setCurrentTablePage] = useState(1);
-  
+
   const sortedPosts = [...posts].sort((a, b) => {
     if (a.isFeatured && !b.isFeatured) return -1;
     if (!a.isFeatured && b.isFeatured) return 1;
@@ -315,42 +330,57 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
             />
           </div>
 
-          <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4 border border-[var(--border)] p-4 rounded-lg bg-[var(--bg)]">
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isFeatured}
-                onChange={(e) => setIsFeatured(e.target.checked)}
-                disabled={
-                  !isFeatured && posts.filter((p) => p.isFeatured).length >= 1
-                }
-                className="w-4 h-4 cursor-pointer accent-[var(--green)]"
-              />
-              <div className="flex flex-col">
-                <span className="text-[13px] font-bold">Featured Story</span>
-                <span className="text-[11px] text-[var(--muted)]">
-                  Shows on Homepage (Max 1)
-                </span>
+          <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+            <fieldset className="rounded-lg border border-[var(--border)] bg-[var(--bg)] p-4">
+              <legend className="px-1 text-xs font-bold uppercase text-[var(--muted)]">
+                Story category (required)
+              </legend>
+              <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3 md:grid-cols-1">
+                {STORY_CATEGORIES.map((category) => (
+                  <label
+                    className="flex cursor-pointer items-start gap-3 rounded-md border border-white/10 p-3 transition hover:border-[var(--green)]/60"
+                    key={category}
+                  >
+                    <input
+                      type="radio"
+                      name="story-category"
+                      value={category}
+                      checked={selectedCategory === category}
+                      onChange={() => setSelectedCategory(category)}
+                      required
+                      className="mt-0.5 h-4 w-4 cursor-pointer accent-[var(--green)]"
+                      data-testid={`post-category-${category.toLowerCase().replace(/\s+/g, "-")}`}
+                    />
+                    <span className="text-[13px] font-bold">{category}</span>
+                  </label>
+                ))}
               </div>
-            </label>
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isTopOnTheList}
-                onChange={(e) => setIsTopOnTheList(e.target.checked)}
-                disabled={
-                  !isTopOnTheList &&
-                  posts.filter((p) => p.isTopOnTheList).length >= 4
-                }
-                className="w-4 h-4 cursor-pointer accent-[var(--green)]"
-              />
-              <div className="flex flex-col">
-                <span className="text-[13px] font-bold">Top on the List</span>
-                <span className="text-[11px] text-[var(--muted)]">
-                  Shows in Top Items section (Max 4)
+            </fieldset>
+
+            <fieldset className="rounded-lg border border-[var(--border)] bg-[var(--bg)] p-4">
+              <legend className="px-1 text-xs font-bold uppercase text-[var(--muted)]">
+                Homepage placement
+              </legend>
+              <label className="mt-2 flex cursor-pointer items-start gap-3 rounded-md border border-white/10 p-3 transition hover:border-[var(--green)]/60">
+                <input
+                  type="checkbox"
+                  checked={isTopOnTheList}
+                  onChange={(e) => setIsTopOnTheList(e.target.checked)}
+                  disabled={
+                    !isTopOnTheList &&
+                    posts.filter((p) => p.isTopOnTheList).length >= 4
+                  }
+                  className="mt-0.5 h-4 w-4 cursor-pointer accent-[var(--green)]"
+                  data-testid="post-top-on-list-toggle"
+                />
+                <span className="flex flex-col">
+                  <span className="text-[13px] font-bold">Top on the List</span>
+                  <span className="text-[11px] text-[var(--muted)]">
+                    Also show this story in the homepage Top on the List section (max 4).
+                  </span>
                 </span>
-              </div>
-            </label>
+              </label>
+            </fieldset>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-[1fr_120px] gap-4 mb-5">
@@ -448,7 +478,9 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
               <tr>
                 <th>Date</th>
                 <th>Headline</th>
-                <th className="hidden group-[.sidebar-collapsed]:table-cell">Author / Subtitle</th>
+                <th className="hidden group-[.sidebar-collapsed]:table-cell">
+                  Author / Subtitle
+                </th>
                 <th>Thumbnail</th>
                 <th>Actions</th>
               </tr>
@@ -464,7 +496,9 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
                     <td className="font-semibold max-w-[300px]">
                       {post.headline}
                     </td>
-                    <td className="hidden group-[.sidebar-collapsed]:table-cell text-[var(--muted)]">{post.sub}</td>
+                    <td className="hidden group-[.sidebar-collapsed]:table-cell text-[var(--muted)]">
+                      {post.sub}
+                    </td>
                     <td>
                       {post.thumbUrl ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
@@ -550,7 +584,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
           </table>
         </div>
       </div>
-      
+
       <ConfirmLightbox
         isOpen={!!confirmDeleteId}
         title="Delete Story?"

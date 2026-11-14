@@ -33,7 +33,7 @@ export default function HomePage() {
         fetch(`/api/hero-slides?t=${t}`),
         fetch(`/api/posts?isTopOnTheList=true&t=${t}`),
         fetch(`/api/quotes?t=${t}`),
-        fetch(`/api/posts?limit=3&t=${t}`),
+        fetch(`/api/posts?limit=3&sort=NEWEST&t=${t}`),
       ]);
 
       // Maximum limit for items to display on the homepage
@@ -64,7 +64,7 @@ export default function HomePage() {
       if (postsRes.ok) {
         const payload = await postsRes.json();
         const data = payload.data || payload;
-        if (Array.isArray(data)) setPosts(data.slice(0, HOMEPAGE_LIMIT));
+        if (Array.isArray(data)) setPosts(data.slice(0, 3));
       }
     } catch (e) {
       console.warn("Failed to fetch data:", e);
@@ -117,7 +117,7 @@ export default function HomePage() {
         <>
           <HeroSlider slides={heroSlides} />
           <TopListSection items={topItems} />
-          <PostsSection posts={posts} />
+          <PostsSection posts={posts} title="Latest stories" itemsPerPage={3} />
           <QuoteSection quotes={quotes} />
         </>
       )}
