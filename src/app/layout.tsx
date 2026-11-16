@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description:
     "If you create, then you belong here. Creanote is a space for creatives to share raw struggles, lessons, quotes, and notes from their journey.",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.png",
   },
 };
 

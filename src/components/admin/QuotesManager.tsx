@@ -29,6 +29,9 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [selectedQuoteIds, setSelectedQuoteIds] = useState<string[]>([]);
+  const [confirmBatchDeleteIds, setConfirmBatchDeleteIds] = useState<string[]>([]);
+  const [isBatchDeleting, setIsBatchDeleting] = useState(false);
 
   const resetForm = () => {
     setEditingId(null);
@@ -108,6 +111,49 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
     }
   };
 
+  const toggleQuoteSelection = (quoteId: string) => {
+    setSelectedQuoteIds((current) =>
+      current.includes(quoteId)
+        ? current.filter((id) => id !== quoteId)
+        : [...current, quoteId],
+    );
+  };
+
+  const handleBatchDelete = () => {
+    if (selectedQuoteIds.length > 0) {
+      setConfirmBatchDeleteIds(selectedQuoteIds);
+    }
+  };
+
+  const performBatchDelete = async () => {
+    const ids = confirmBatchDeleteIds;
+    if (ids.length === 0) return;
+
+    setConfirmBatchDeleteIds([]);
+    setIsBatchDeleting(true);
+    setStatus(`Deleting ${ids.length} quotes...`);
+    try {
+      const results = await Promise.all(
+        ids.map((id) => fetch(`/api/quotes/${id}`, { method: 'DELETE' })),
+      );
+      if (results.every((res) => res.ok)) {
+        setSelectedQuoteIds([]);
+        setStatus(`${ids.length} quotes deleted successfully!`);
+        addLog(`Deleted ${ids.length} quotes`, 'delete');
+        onRefresh();
+      } else {
+        setIsError(true);
+        setStatus('Some quotes could not be deleted.');
+      }
+    } catch (e) {
+      console.error(e);
+      setIsError(true);
+      setStatus('Error deleting selected quotes.');
+    } finally {
+      setIsBatchDeleting(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -161,6 +207,18 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
   const totalTablePages = Math.ceil(quotes.length / ITEMS_PER_PAGE) || 1;
   const startIdx = (currentTablePage - 1) * ITEMS_PER_PAGE;
   const paginatedQuotes = quotes.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+  const paginatedQuoteIds = paginatedQuotes
+    .map((quote) => quote.id || (quote as any)._id)
+    .filter((id): id is string => Boolean(id));
+
+  const toggleCurrentPageSelection = () => {
+    const allSelected = paginatedQuoteIds.every((id) => selectedQuoteIds.includes(id));
+    setSelectedQuoteIds((current) =>
+      allSelected
+        ? current.filter((id) => !paginatedQuoteIds.includes(id))
+        : Array.from(new Set([...current, ...paginatedQuoteIds])),
+    );
+  };
 
   return (
     <div>
@@ -290,7 +348,20 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
       </div>
 
       <div className="admin-card mt-8 overflow-hidden">
-        <h4 className="text-base font-bold mb-4">Existing Quotes</h4>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h4 className="text-base font-bold">Existing Quotes</h4>
+          {selectedQuoteIds.length > 0 && (
+            <button
+              type="button"
+              onClick={handleBatchDelete}
+              disabled={isBatchDeleting}
+              className="admin-btn-danger text-xs px-3 py-1.5"
+              data-testid="delete-selected-quotes-btn"
+            >
+              Delete selected ({selectedQuoteIds.length})
+            </button>
+          )}
+        </div>
         
         {quotes.length === 0 ? (
           <div className="text-center py-10 text-[var(--muted)] text-sm">
@@ -331,10 +402,36 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
                         </svg>
                       </button>
                     </div>
+                    {quoteId && (
+                      <label className="absolute bottom-2 left-2 z-10 flex cursor-pointer items-center gap-1.5 rounded bg-black/70 px-2 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
+                        <input
+                          type="checkbox"
+                          checked={selectedQuoteIds.includes(quoteId)}
+                          onChange={() => toggleQuoteSelection(quoteId)}
+                          onClick={(e) => e.stopPropagation()}
+                          aria-label={`Select quote ${idx + 1}`}
+                          className="h-3.5 w-3.5 cursor-pointer accent-[var(--green)]"
+                        />
+                        Select
+                      </label>
+                    )}
                   </div>
                 );
               })}
             </div>
+
+            {paginatedQuoteIds.length > 0 && (
+              <label className="mt-4 flex cursor-pointer items-center gap-2 text-xs font-bold text-[var(--muted)]">
+                <input
+                  type="checkbox"
+                  checked={paginatedQuoteIds.every((id) => selectedQuoteIds.includes(id))}
+                  onChange={toggleCurrentPageSelection}
+                  aria-label="Select all quotes on this page"
+                  className="h-4 w-4 cursor-pointer accent-[var(--green)]"
+                />
+                Select all quotes on this page
+              </label>
+            )}
             
             {totalTablePages > 1 && (
               <div className="flex items-center justify-between border-t border-[var(--border)] pt-4 mt-6">
@@ -427,6 +524,14 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
         message="Are you sure you want to permanently delete this quote? This action cannot be undone."
         onConfirm={performDelete}
         onCancel={() => setConfirmDeleteId(null)}
+      />
+
+      <ConfirmLightbox
+        isOpen={confirmBatchDeleteIds.length > 0}
+        title="Delete Selected Quotes?"
+        message={`Are you sure you want to permanently delete ${confirmBatchDeleteIds.length} selected quotes? This action cannot be undone.`}
+        onConfirm={performBatchDelete}
+        onCancel={() => setConfirmBatchDeleteIds([])}
       />
 
       <SuccessLightbox

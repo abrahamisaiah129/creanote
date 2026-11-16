@@ -41,6 +41,9 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [selectedPostIds, setSelectedPostIds] = useState<string[]>([]);
+  const [confirmBatchDeleteIds, setConfirmBatchDeleteIds] = useState<string[]>([]);
+  const [isBatchDeleting, setIsBatchDeleting] = useState(false);
 
   const resetForm = () => {
     setEditingId(null);
@@ -166,6 +169,49 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
     }
   };
 
+  const togglePostSelection = (postId: string) => {
+    setSelectedPostIds((current) =>
+      current.includes(postId)
+        ? current.filter((id) => id !== postId)
+        : [...current, postId],
+    );
+  };
+
+  const handleBatchDelete = () => {
+    if (selectedPostIds.length > 0) {
+      setConfirmBatchDeleteIds(selectedPostIds);
+    }
+  };
+
+  const performBatchDelete = async () => {
+    const ids = confirmBatchDeleteIds;
+    if (ids.length === 0) return;
+
+    setConfirmBatchDeleteIds([]);
+    setIsBatchDeleting(true);
+    setStatus(`Deleting ${ids.length} stories...`);
+    try {
+      const results = await Promise.all(
+        ids.map((id) => fetch(`/api/posts/${id}`, { method: "DELETE" })),
+      );
+      if (results.every((res) => res.ok)) {
+        setSelectedPostIds([]);
+        setStatus(`${ids.length} stories deleted successfully!`);
+        addLog(`Deleted ${ids.length} stories`, "delete");
+        onRefresh();
+      } else {
+        setIsError(true);
+        setStatus("Some stories could not be deleted.");
+      }
+    } catch (e) {
+      console.error(e);
+      setIsError(true);
+      setStatus("Error deleting selected stories.");
+    } finally {
+      setIsBatchDeleting(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedCategory) {
@@ -233,6 +279,18 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
   const totalTablePages = Math.ceil(sortedPosts.length / ITEMS_PER_PAGE) || 1;
   const startIdx = (currentTablePage - 1) * ITEMS_PER_PAGE;
   const paginatedPosts = sortedPosts.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+  const paginatedPostIds = paginatedPosts
+    .map((post) => post.id || (post as any)._id)
+    .filter((id): id is string => Boolean(id));
+
+  const toggleCurrentPageSelection = () => {
+    const allSelected = paginatedPostIds.every((id) => selectedPostIds.includes(id));
+    setSelectedPostIds((current) =>
+      allSelected
+        ? current.filter((id) => !paginatedPostIds.includes(id))
+        : Array.from(new Set([...current, ...paginatedPostIds])),
+    );
+  };
 
   return (
     <div>
@@ -345,7 +403,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
                       type="radio"
                       name="story-category"
                       value={category}
-                      checked={selectedCategory === category}
+                  checked={selectedCategory === category}
                       onChange={() => setSelectedCategory(category)}
                       required
                       className="mt-0.5 h-4 w-4 cursor-pointer accent-[var(--green)]"
@@ -435,6 +493,17 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
           </h4>
 
           <div className="flex items-center gap-3">
+            {selectedPostIds.length > 0 && (
+              <button
+                type="button"
+                onClick={handleBatchDelete}
+                disabled={isBatchDeleting}
+                className="admin-btn-danger text-xs py-1.5 px-3"
+                data-testid="delete-selected-posts-btn"
+              >
+                Delete selected ({selectedPostIds.length})
+              </button>
+            )}
             {posts.length > 0 && (
               <div className="flex items-center gap-2">
                 <button
@@ -476,6 +545,18 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
           <table className="admin-table min-w-[620px]">
             <thead>
               <tr>
+                <th>
+                  <input
+                    type="checkbox"
+                    checked={
+                      paginatedPostIds.length > 0 &&
+                      paginatedPostIds.every((id) => selectedPostIds.includes(id))
+                    }
+                    onChange={toggleCurrentPageSelection}
+                    aria-label="Select all stories on this page"
+                    className="h-4 w-4 cursor-pointer accent-[var(--green)]"
+                  />
+                </th>
                 <th>Date</th>
                 <th>Headline</th>
                 <th className="hidden group-[.sidebar-collapsed]:table-cell">
@@ -490,6 +571,17 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
                 const postId = post.id || (post as any)._id;
                 return (
                   <tr key={postId || idx}>
+                    <td>
+                      {postId && (
+                        <input
+                          type="checkbox"
+                          checked={selectedPostIds.includes(postId)}
+                          onChange={() => togglePostSelection(postId)}
+                          aria-label={`Select ${post.headline}`}
+                          className="h-4 w-4 cursor-pointer accent-[var(--green)]"
+                        />
+                      )}
+                    </td>
                     <td className="text-[var(--orange)] font-bold">
                       {formatDate(post.date)}
                     </td>
@@ -591,6 +683,14 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
         message="Are you sure you want to permanently delete this story? This action cannot be undone."
         onConfirm={performDelete}
         onCancel={() => setConfirmDeleteId(null)}
+      />
+
+      <ConfirmLightbox
+        isOpen={confirmBatchDeleteIds.length > 0}
+        title="Delete Selected Stories?"
+        message={`Are you sure you want to permanently delete ${confirmBatchDeleteIds.length} selected stories? This action cannot be undone.`}
+        onConfirm={performBatchDelete}
+        onCancel={() => setConfirmBatchDeleteIds([])}
       />
 
       <SuccessLightbox
