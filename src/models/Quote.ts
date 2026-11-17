@@ -2,6 +2,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IQuote extends Document {
   imageUrl: string;
+  originalUrl?: string;
   isActive: boolean;
   createdAt: Date;
   quoteText?: string;
@@ -12,6 +13,7 @@ export interface IQuote extends Document {
 
 const QuoteSchema: Schema = new Schema({
   imageUrl: { type: String, required: true },
+  originalUrl: { type: String, default: '' },
   isActive: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   quoteText: { type: String, default: '' },

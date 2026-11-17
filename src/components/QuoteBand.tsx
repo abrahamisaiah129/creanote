@@ -6,6 +6,7 @@ import Link from 'next/link';
 export interface QuoteData {
   id?: string;
   imageUrl?: string;
+  originalUrl?: string;
   createdAt?: string | Date;
   isActive?: boolean;
   order?: number;

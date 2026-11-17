@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
-import { BackToTop } from '@/components/BackToTop';
-import { ContributeModal } from '@/components/ContributeModal';
-import { UploadCloud, ArrowUpRight } from 'lucide-react';
+import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { BackToTop } from "@/components/BackToTop";
+import { ContributeModal } from "@/components/ContributeModal";
+import { UploadCloud, ArrowUpRight } from "lucide-react";
 
 export default function AboutPage() {
   const [isContributeOpen, setIsContributeOpen] = useState(false);
@@ -28,13 +28,21 @@ export default function AboutPage() {
             If you create, then you belong here.
           </p>
           <p className="mb-4">
-            Creanote was founded on a simple truth: the creative journey is often romanticized at the finish line, but rarely documented in its raw, messy, and vulnerable beginnings.
+            Creanote was founded on a simple truth: the creative journey is
+            often romanticized at the finish line, but rarely documented in its
+            raw, messy, and vulnerable beginnings.
           </p>
           <p className="mb-4">
-            Whether you are a developer pushing your first repository, a designer crafting interfaces late into the night, a writer battling blank pages, or an entrepreneur pivoting after unexpected hurdles, Creanote is your community timeline.
+            Whether you are a developer pushing your first repository, a
+            designer crafting interfaces late into the night, a writer battling
+            blank pages, or an entrepreneur pivoting after unexpected hurdles,
+            Creanote is your community timeline.
           </p>
           <p className="mb-6">
-            We celebrate the failed attempts that teach mastery, the quiet daily commits that compound over time, and the unvarnished stories that remind every creator: your current struggle isn&apos;t your permanent reality.
+            We celebrate the failed attempts that teach mastery, the quiet daily
+            commits that compound over time, and the unvarnished stories that
+            remind every creator: your current struggle isn&apos;t your
+            permanent reality.
           </p>
         </div>
 
@@ -61,13 +69,15 @@ export default function AboutPage() {
           <div className="relative z-10 flex flex-col justify-between gap-8 p-6 sm:p-10 md:p-12 lg:flex-row lg:items-center">
             {/* Left Content */}
             <div className="max-w-[620px]">
-
               <h2 className="mt-4 font-['Ubuntu'] text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl">
                 Have a Quote That Inspires Creators?
               </h2>
 
               <p className="mt-3 text-[14px] leading-relaxed text-[#c7d0cb] sm:text-[15px]">
-                Share the words, lessons, or raw mantras that kept you going through your hardest builds. Upload your quote with your desired artwork or photo to be featured across the Creanote community timeline.
+                Share the words, lessons, or raw mantras that kept you going
+                through your hardest builds. Upload your quote with your desired
+                artwork or photo to be featured across the Creanote community
+                timeline.
               </p>
 
               {/* Action Buttons */}
@@ -95,18 +105,23 @@ export default function AboutPage() {
             {/* Right Preview Card */}
             <div className="w-full max-w-[340px] rounded-2xl border border-white/15 bg-black/40 p-5 backdrop-blur-md max-lg:self-start">
               <div className="flex items-center justify-between text-xs text-[var(--muted)]">
-                <span className="font-mono text-[11px] font-bold text-[var(--green)]">LIVE FEATURE</span>
+                <span className="font-mono text-[11px] font-bold text-[var(--green)]">
+                  ANONYMOUS
+                </span>
               </div>
               <p className="mt-3 font-serif text-base italic leading-snug text-white">
-                &ldquo;The quiet commits made when nobody is watching compound into monuments.&rdquo;
+                &ldquo; Let your foundation be your motivation, not your
+                habitations ...Change only happens with motion. &rdquo;
               </p>
               <div className="mt-4 flex items-center gap-2.5 border-t border-white/10 pt-3">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--green)]/20 text-xs font-bold text-[var(--green)]">
-                  C
+                  A
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-white">Your Name & Visual</p>
-                  <p className="text-[10px] text-[var(--muted)]">Your Niche</p>
+                  <p className="text-xs font-bold text-white">Anonymous</p>
+                  <p className="text-[10px] text-[var(--muted)]">
+                    Lifestyle Content Creator
+                  </p>
                 </div>
               </div>
             </div>
@@ -119,7 +134,8 @@ export default function AboutPage() {
             Explore More From Creanote
           </h4>
           <p className="mb-4 text-sm text-[var(--text)]">
-            Dive into developer journals, startup retrospectives, and visual essays.
+            Dive into developer journals, startup retrospectives, and visual
+            essays.
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-3">
             <Link

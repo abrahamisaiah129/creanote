@@ -18,10 +18,9 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
   const { addLog } = useActivityLog();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState('');
-  const [isActive, setIsActive] = useState(false);
+  const [originalUrl, setOriginalUrl] = useState('');
   const [quoteText, setQuoteText] = useState('');
   const [name, setName] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
   const [meaning, setMeaning] = useState('');
   const [status, setStatus] = useState('');
   const [isError, setIsError] = useState(false);
@@ -36,10 +35,9 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
   const resetForm = () => {
     setEditingId(null);
     setImageUrl('');
-    setIsActive(false);
+    setOriginalUrl('');
     setQuoteText('');
     setName('');
-    setAvatarUrl('');
     setMeaning('');
     setStatus('');
     setIsError(false);
@@ -48,41 +46,11 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
   const handleEdit = (q: QuoteData) => {
     setEditingId(q.id || (q as any)._id || null);
     setImageUrl(q.imageUrl || '');
-    setIsActive(!!q.isActive);
+    setOriginalUrl(q.originalUrl || '');
     setQuoteText(q.quoteText || '');
     setName(q.name || '');
-    setAvatarUrl(q.avatarUrl || '');
     setMeaning(q.meaning || '');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleToggleHero = async (q: QuoteData) => {
-    if (!q.isActive && quotes.filter((quote) => quote.isActive).length >= 5) {
-      setIsError(true);
-      setStatus("Max reached: Only 5 quotes can be active at a time.");
-      return;
-    }
-
-    const quoteId = q.id || (q as any)._id;
-    if (!quoteId) return;
-    setStatus('Updating quote status...');
-    setIsError(false);
-    try {
-      const res = await fetch(`/api/quotes/${quoteId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...q, isActive: !q.isActive }),
-      });
-      if (res.ok) {
-        setStatus(`Quote ${!q.isActive ? 'set as active' : 'deactivated'}!`);
-        addLog(`${!q.isActive ? 'Activated' : 'Deactivated'} quote image`, 'update');
-        onRefresh();
-      }
-    } catch (e) {
-      console.error(e);
-      setIsError(true);
-      setStatus('Error updating quote.');
-    }
   };
 
   const handleDelete = (id?: string) => {
@@ -161,10 +129,9 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
 
     const payload = {
       imageUrl,
-      isActive,
+      originalUrl: originalUrl.trim(),
       quoteText,
       name,
-      avatarUrl,
       meaning
     };
 
@@ -257,10 +224,24 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
             onChange={setImageUrl}
           />
 
+          <div className="mb-5">
+            <label className="text-xs text-[var(--muted)] uppercase mb-1.5 block">
+              Original Quote URL (Optional)
+            </label>
+            <input
+              type="url"
+              className="admin-input"
+              placeholder="https://..."
+              value={originalUrl}
+              onChange={(e) => setOriginalUrl(e.target.value)}
+              data-testid="quote-original-url-input"
+            />
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
             <div>
               <label className="text-xs text-[var(--muted)] uppercase mb-1.5 block">
-                User Name (Optional)
+                Image Name / Creator (Optional)
               </label>
               <input
                 type="text"
@@ -268,18 +249,6 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
                 placeholder="e.g. John Doe"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="text-xs text-[var(--muted)] uppercase mb-1.5 block">
-                User Avatar URL (Optional)
-              </label>
-              <input
-                type="text"
-                className="admin-input"
-                placeholder="https://example.com/avatar.png"
-                value={avatarUrl}
-                onChange={(e) => setAvatarUrl(e.target.value)}
               />
             </div>
           </div>
@@ -306,23 +275,6 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
               value={meaning}
               onChange={(e) => setMeaning(e.target.value)}
             />
-          </div>
-
-          <div className="mb-6 flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-lg">
-            <div>
-              <div className="font-bold text-sm mb-1">Make Active</div>
-              <div className="text-xs text-[var(--muted)]">If active, this quote will show on the main timeline.</div>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isActive}
-                onChange={(e) => setIsActive(e.target.checked)}
-                className="sr-only peer"
-                data-testid="quote-is-active-toggle"
-              />
-              <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--green)]"></div>
-            </label>
           </div>
 
           <div className="flex items-center justify-end gap-3 mt-8">
@@ -384,24 +336,6 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
                     ) : (
                       <div className="h-full w-full flex items-center justify-center text-xs text-[var(--muted)]">No Img</div>
                     )}
-                    <div className="absolute top-2 right-2 z-10">
-                      <button 
-                        onClick={(e) => { 
-                          e.stopPropagation(); 
-                          handleToggleHero(q); 
-                        }}
-                        className={`p-1.5 rounded-full backdrop-blur-md border transition ${
-                          q.isActive 
-                            ? 'bg-[var(--green)]/20 text-[var(--green)] border-[var(--green)]/50' 
-                            : 'bg-black/40 text-white/50 border-white/20 hover:text-white hover:bg-black/60'
-                        }`}
-                        title={q.isActive ? "Deactivate Quote" : "Activate Quote"}
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill={q.isActive ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                        </svg>
-                      </button>
-                    </div>
                     {quoteId && (
                       <label className="absolute bottom-2 left-2 z-10 flex cursor-pointer items-center gap-1.5 rounded bg-black/70 px-2 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
                         <input
@@ -482,12 +416,7 @@ export const QuotesManager: React.FC<QuotesManagerProps> = ({ quotes, onRefresh 
                         {q.name && <p className="text-xs font-bold text-[var(--orange)] mt-2">- {q.name}</p>}
                       </div>
                       
-                      <div className="w-full flex justify-between items-center mt-4 p-4 bg-[#0a0f0c] border border-[var(--border)] rounded-xl">
-                        <div className="text-xs text-[var(--muted)]">
-                          <span className={q.isActive ? 'text-[var(--green)]' : 'text-white/50'}>
-                            {q.isActive ? 'Currently Active' : 'Currently Hidden'}
-                          </span>
-                        </div>
+                      <div className="w-full flex justify-end items-center mt-4 p-4 bg-[#0a0f0c] border border-[var(--border)] rounded-xl">
                         <div className="flex gap-3">
                           <button
                             onClick={() => {

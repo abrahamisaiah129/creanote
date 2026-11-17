@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { PostRow, PostData } from './PostRow';
-import { Pagination } from './Pagination';
+import React, { useState } from "react";
+import Link from "next/link";
+import { PostRow, PostData } from "./PostRow";
+import { Pagination } from "./Pagination";
 
 interface PostsSectionProps {
   posts: PostData[];
@@ -15,7 +15,7 @@ interface PostsSectionProps {
 
 export const PostsSection: React.FC<PostsSectionProps> = ({
   posts,
-  title = 'Posts',
+  title = "Posts",
   itemsPerPage = 3,
   onPostClick,
 }) => {

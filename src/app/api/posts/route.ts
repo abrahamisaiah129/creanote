@@ -139,7 +139,30 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { date, headline, sub, thumbUrl, isFeatureBadge, featureText, authorAvatar, gallery, category } = body;
+    const {
+      date,
+      headline,
+      sub,
+      content,
+      slug,
+      postURL,
+      title,
+      excerpt,
+      thumbUrl,
+      coverImage,
+      author,
+      authorName,
+      authorRole,
+      authorAvatar,
+      tags,
+      readTime,
+      isFeatureBadge,
+      featureText,
+      isFeatured,
+      isTopOnTheList,
+      gallery,
+      category,
+    } = body;
 
     if (!headline || !date || !sub || !isStoryCategory(category?.trim().toUpperCase())) {
       return NextResponse.json(
@@ -156,15 +179,36 @@ export async function POST(req: Request) {
       );
     }
 
+    const subParts = String(sub)
+      .split("|")
+      .map((part: string) => part.trim());
+    const resolvedAuthorName =
+      authorName || author || subParts[0] || "Creanote Creator";
+    const resolvedAuthorRole =
+      authorRole || subParts[2] || subParts[1] || "Creator";
+
     const newPost = await Post.create({
       date,
       headline,
+      title: title || headline,
       sub,
-      thumbUrl: thumbUrl || '',
-      authorAvatar: authorAvatar || '',
+      excerpt: excerpt || sub,
+      content: content || "",
+      slug,
+      postURL: postURL || "",
+      thumbUrl: thumbUrl || "",
+      coverImage: coverImage || thumbUrl || "",
+      author: resolvedAuthorName,
+      authorName: resolvedAuthorName,
+      authorRole: resolvedAuthorRole,
+      authorAvatar: authorAvatar || "",
       category: category.trim().toUpperCase(),
+      tags: Array.isArray(tags) ? tags : [],
+      readTime: readTime || "4 min read",
       isFeatureBadge: !!isFeatureBadge,
       featureText: featureText || '',
+      isFeatured: !!isFeatured,
+      isTopOnTheList: !!isTopOnTheList,
       gallery: Array.isArray(gallery) ? gallery : [],
     });
 

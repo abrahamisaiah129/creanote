@@ -7,10 +7,14 @@ import { placeholderUrl } from '@/lib/defaultData';
 
 export interface PostData {
   id?: string;
+  _id?: string;
   slug?: string;
+  postURL?: string;
   date: string;
   headline: string;
+  title?: string;
   sub: string;
+  excerpt?: string;
   thumbUrl?: string;
   coverImage?: string;
   isFeatureBadge?: boolean;
@@ -19,12 +23,15 @@ export interface PostData {
   isTopOnTheList?: boolean;
   category?: string;
   author?: string;
+  authorName?: string;
   authorRole?: string;
   authorAvatar?: string;
   readTime?: string;
+  readingTime?: string;
   content?: string;
   tags?: string[];
   gallery?: string[];
+  createdAt?: string;
   page?: number;
   order?: number;
 }

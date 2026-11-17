@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import { Post } from '@/models/Post';
 import { isStoryCategory } from '@/lib/defaultData';
+import { normalizePostData } from '@/lib/postData';
 
 import mongoose from 'mongoose';
 
@@ -28,7 +29,9 @@ export async function GET(
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
 
-    return NextResponse.json(post);
+    return NextResponse.json(
+      normalizePostData(post as unknown as Record<string, unknown>),
+    );
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Server error';
     return NextResponse.json({ error: msg }, { status: 500 });

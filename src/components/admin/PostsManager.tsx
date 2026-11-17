@@ -29,10 +29,13 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Default to today's date
   const [headline, setHeadline] = useState("");
   const [sub, setSub] = useState("");
+  const [readTime, setReadTime] = useState("short read");
   const [thumbUrl, setThumbUrl] = useState(
     placeholderUrl("Post thumbnail", 640, 360),
   );
-  const [selectedCategory, setSelectedCategory] = useState<StoryCategory | "">("");
+  const [selectedCategory, setSelectedCategory] = useState<StoryCategory | "">(
+    "",
+  );
   const [isTopOnTheList, setIsTopOnTheList] = useState(false);
   const [content, setContent] = useState("");
   const [authorAvatar, setAuthorAvatar] = useState("");
@@ -42,9 +45,15 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [selectedPostIds, setSelectedPostIds] = useState<string[]>([]);
-  const [confirmBatchDeleteIds, setConfirmBatchDeleteIds] = useState<string[]>([]);
+  const [confirmBatchDeleteIds, setConfirmBatchDeleteIds] = useState<string[]>(
+    [],
+  );
   const [isBatchDeleting, setIsBatchDeleting] = useState(false);
-
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [authorName, setAuthorName] = useState("");
+  const [authorRole, setAuthorRole] = useState("");
+  const [coverImage, setCoverImage] = useState("");
+  const [postURL, setPostURL] = useState("");
   const resetForm = () => {
     setEditingId(null);
     setDate("");
@@ -55,8 +64,18 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
     setIsTopOnTheList(false);
     setContent("");
     setAuthorAvatar("");
+    setThumbnailUrl("");
+    setAuthorName("");
+    setAuthorRole("");
+    setCoverImage("");
+    setPostURL("");
     setStatus("");
     setIsError(false);
+    setReadTime(
+      content
+        ? `${Math.ceil(content.split(" ").length / 200)} min read`
+        : "short read",
+    );
   };
 
   const handleEdit = (post: PostData) => {
@@ -73,6 +92,27 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
     setIsTopOnTheList(!!post.isTopOnTheList);
     setContent(post.content || "");
     setAuthorAvatar(post.authorAvatar || "");
+    const mappedPost = post as PostData & {
+      authorName?: string;
+      authorRole?: string;
+      thumbnailUrl?: string;
+      coverImage?: string;
+      postURL?: string;
+    };
+    setAuthorName(
+      mappedPost.authorName || post.sub?.split("|")[0]?.trim() || "",
+    );
+    setAuthorRole(
+      mappedPost.authorRole ||
+        post.sub?.split("|")[2]?.trim() ||
+        post.sub?.split("|")[1]?.trim() ||
+        "Creator",
+    );
+    setThumbnailUrl(mappedPost.thumbnailUrl || post.thumbUrl || "");
+    setCoverImage(
+      mappedPost.coverImage || mappedPost.thumbnailUrl || post.thumbUrl || "",
+    );
+    setPostURL(mappedPost.postURL || "");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -228,6 +268,15 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
       sub,
       content,
       thumbUrl,
+      thumbnailUrl: thumbnailUrl || thumbUrl,
+      coverImage: coverImage || thumbnailUrl || thumbUrl,
+      postURL: postURL.trim(),
+      authorName: authorName || sub.split("|")[0]?.trim(),
+      authorRole:
+        authorRole ||
+        sub.split("|")[2]?.trim() ||
+        sub.split("|")[1]?.trim() ||
+        "Creator",
       authorAvatar,
       category: selectedCategory,
       isTopOnTheList,
@@ -284,7 +333,9 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
     .filter((id): id is string => Boolean(id));
 
   const toggleCurrentPageSelection = () => {
-    const allSelected = paginatedPostIds.every((id) => selectedPostIds.includes(id));
+    const allSelected = paginatedPostIds.every((id) =>
+      selectedPostIds.includes(id),
+    );
     setSelectedPostIds((current) =>
       allSelected
         ? current.filter((id) => !paginatedPostIds.includes(id))
@@ -354,7 +405,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
           </div>
 
           <div className="mb-4">
-            <label className="text-xs text-[var(--muted)] uppercase">
+            <label className="text-xs text-copy-muted uppercase">
               Story Content (Write up)
             </label>
             <textarea
@@ -379,6 +430,32 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
                 data-testid="post-sub-input"
               />
             </div>
+            <div>
+              <label className="text-xs text-[var(--muted)] uppercase">
+                Author
+              </label>
+              <input
+                className="admin-input"
+                value={authorName}
+                onChange={(e) => setAuthorName(e.target.value)}
+                placeholder="e.g. Faith Borntowin"
+                required
+                data-testid="post-author-input"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-[var(--muted)] uppercase">
+                Author Role
+              </label>
+              <input
+                className="admin-input"
+                value={authorRole}
+                onChange={(e) => setAuthorRole(e.target.value)}
+                placeholder="e.g. Developer"
+                required
+                data-testid="post-author-role-input"
+              />
+            </div>
             <ImageUploadField
               label="Author Avatar (Optional)"
               value={authorAvatar}
@@ -386,6 +463,19 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
               testId="post-author-avatar-input"
               aspectRatioHint="Recommended: 1:1 circle/square avatar"
             />
+            <div>
+              <label className="text-xs text-[var(--muted)] uppercase">
+                Original Post URL (Optional)
+              </label>
+              <input
+                type="url"
+                className="admin-input"
+                value={postURL}
+                onChange={(e) => setPostURL(e.target.value)}
+                placeholder="https://..."
+                data-testid="post-url-input"
+              />
+            </div>
           </div>
 
           <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -403,7 +493,7 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
                       type="radio"
                       name="story-category"
                       value={category}
-                  checked={selectedCategory === category}
+                      checked={selectedCategory === category}
                       onChange={() => setSelectedCategory(category)}
                       required
                       className="mt-0.5 h-4 w-4 cursor-pointer accent-[var(--green)]"
@@ -434,7 +524,8 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
                 <span className="flex flex-col">
                   <span className="text-[13px] font-bold">Top on the List</span>
                   <span className="text-[11px] text-[var(--muted)]">
-                    Also show this story in the homepage Top on the List section (max 4).
+                    Also show this story in the homepage Top on the List section
+                    (max 4).
                   </span>
                 </span>
               </label>
@@ -450,7 +541,11 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
               <ImageUploadField
                 label="Thumbnail / Cover (640x360)"
                 value={thumbUrl}
-                onChange={setThumbUrl}
+                onChange={(value) => {
+                  setThumbUrl(value);
+                  setThumbnailUrl(value);
+                  setCoverImage(value);
+                }}
                 fallbackPlaceholder={placeholderUrl("Post thumbnail", 640, 360)}
                 testId="post-thumb-input"
                 aspectRatioHint="Recommended: 16:9 widescreen thumbnail"
@@ -550,7 +645,9 @@ export const PostsManager: React.FC<PostsManagerProps> = ({
                     type="checkbox"
                     checked={
                       paginatedPostIds.length > 0 &&
-                      paginatedPostIds.every((id) => selectedPostIds.includes(id))
+                      paginatedPostIds.every((id) =>
+                        selectedPostIds.includes(id),
+                      )
                     }
                     onChange={toggleCurrentPageSelection}
                     aria-label="Select all stories on this page"

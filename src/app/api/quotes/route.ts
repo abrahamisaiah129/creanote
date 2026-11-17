@@ -45,7 +45,10 @@ export async function GET(req: Request) {
     }
 
     // Offline / unit-test fallback
-    let result = [...defaultQuotes];
+    const result = [...defaultQuotes].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
     
     if (paginated) {
       return NextResponse.json({
@@ -68,7 +71,6 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const imageUrl = body.imageUrl || '';
-    const isActive = body.isActive !== undefined ? !!body.isActive : false;
 
     if (!imageUrl) {
       return NextResponse.json(
@@ -87,7 +89,7 @@ export async function POST(req: Request) {
 
     const newQuote = await Quote.create({
       imageUrl,
-      isActive,
+      originalUrl: body.originalUrl || '',
       quoteText: body.quoteText || '',
       name: body.name || '',
       avatarUrl: body.avatarUrl || '',
